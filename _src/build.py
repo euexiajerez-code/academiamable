@@ -13,8 +13,14 @@ RAIZ = os.path.dirname(SRC)
 sys.path.insert(0, os.path.join(SRC, 'contenido'))
 from curso_ia import CURSO          # noqa: E402
 from leccion_1_1 import LECCION as L11  # noqa: E402
+from leccion_1_2 import LECCION as L12  # noqa: E402
+from leccion_1_3 import LECCION as L13  # noqa: E402
+from leccion_2_1 import LECCION as L21  # noqa: E402
+from leccion_2_2 import LECCION as L22  # noqa: E402
+from leccion_2_3 import LECCION as L23  # noqa: E402
+from leccion_2_4 import LECCION as L24  # noqa: E402
 
-LECCIONES = {L11['id']: L11}
+LECCIONES = {L['id']: L for L in (L11, L12, L13, L21, L22, L23, L24)}
 DOM = 'https://academiamable.es'
 WA = '34639924211'                  # Provisional: el WhatsApp de IA-Mable (pendiente de decidir)
 WA_TXT = '+34 639 924 211'

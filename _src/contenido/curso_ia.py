@@ -22,15 +22,15 @@ CURSO = {
          'tarea': 'Apunta 5 sitios de tu día a día donde ya hay IA',
          'lecciones': [
              ('que-es-y-que-no-es', 'Qué es y qué no es la IA', True),
-             ('como-aprende', 'Cómo «aprende» una IA', False),
-             ('ia-que-ya-usas', 'La IA que ya usas sin saberlo', False)]},
+             ('como-aprende', 'Cómo «aprende» una IA', True),
+             ('ia-que-ya-usas', 'La IA que ya usas sin saberlo', True)]},
         {'n': 2, 'titulo': 'Tipos de IA', 'pregunta': '¿Todas las IA son ChatGPT?',
          'tarea': 'Clasifica 10 herramientas en su tipo (juego de arrastrar)',
          'lecciones': [
-             ('ia-que-conversa', 'IA que conversa', False),
-             ('ia-que-crea', 'IA que crea imágenes, vídeo y voz', False),
-             ('ia-que-reconoce', 'IA que reconoce y clasifica', False),
-             ('asistentes-y-agentes', 'Asistentes y agentes', False)]},
+             ('ia-que-conversa', 'IA que conversa', True),
+             ('ia-que-crea', 'IA que crea imágenes, vídeo y voz', True),
+             ('ia-que-reconoce', 'IA que reconoce y clasifica', True),
+             ('asistentes-y-agentes', 'Asistentes y agentes', True)]},
         {'n': 3, 'titulo': 'Las más usadas', 'pregunta': '¿Cuál uso y para qué?',
          'tarea': 'Haz la misma pregunta a dos IA y compara las respuestas',
          'lecciones': [
