@@ -12,6 +12,7 @@ SRC = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(SRC)
 sys.path.insert(0, os.path.join(SRC, 'contenido'))
 from curso_ia import CURSO          # noqa: E402
+import ilustraciones                 # noqa: E402
 from leccion_1_1 import LECCION as L11  # noqa: E402
 from leccion_1_2 import LECCION as L12  # noqa: E402
 from leccion_1_3 import LECCION as L13  # noqa: E402
@@ -57,6 +58,91 @@ CSS = leer('estilos.css')
 JS = leer('app.js')
 V_CSS, V_JS = huella(CSS), huella(JS)
 
+# ---------- Ilustraciones y fotos ----------
+def ilu(nombre, w, h, clase='', lazy=True, alt=''):
+    """Ilustración propia de img/ilus/. Decorativa por defecto (alt vacío)."""
+    carga = ' loading="lazy"' if lazy else ' fetchpriority="high"'
+    c = f' class="{clase}"' if clase else ''
+    return f'<img{c} src="/img/ilus/{nombre}.svg" width="{w}" height="{h}" alt="{e(alt)}"{carga} decoding="async">'
+
+
+def medidas_imagen(ruta):
+    """Ancho y alto de una foto .webp, .jpg o .png sin librerías externas."""
+    with open(ruta, 'rb') as f:
+        d = f.read(64 * 1024)
+    if d[:4] == b'RIFF' and d[8:12] == b'WEBP':
+        ch = d[12:16]
+        if ch == b'VP8 ':
+            return int.from_bytes(d[26:28], 'little') & 0x3FFF, int.from_bytes(d[28:30], 'little') & 0x3FFF
+        if ch == b'VP8L':
+            b = int.from_bytes(d[21:25], 'little')
+            return (b & 0x3FFF) + 1, ((b >> 14) & 0x3FFF) + 1
+        if ch == b'VP8X':
+            return int.from_bytes(d[24:27], 'little') + 1, int.from_bytes(d[27:30], 'little') + 1
+    if d[:8] == b'\x89PNG\r\n\x1a\n':
+        return int.from_bytes(d[16:20], 'big'), int.from_bytes(d[20:24], 'big')
+    if d[:2] == b'\xff\xd8':
+        i = 2
+        while i < len(d) - 9:
+            if d[i] != 0xFF:
+                i += 1; continue
+            mk, ln = d[i + 1], int.from_bytes(d[i + 2:i + 4], 'big')
+            if mk in (0xC0, 0xC1, 0xC2):
+                return int.from_bytes(d[i + 7:i + 9], 'big'), int.from_bytes(d[i + 5:i + 7], 'big')
+            i += 2 + ln
+    return None
+
+
+# Huecos para fotos (opcionales). Si el archivo existe en img/fotos/ (.webp, .jpg o .png), se usa
+# en lugar de la ilustración. El texto alternativo describe la foto: cámbialo aquí si cambias la foto.
+FOTOS = {
+    'portada': 'Una vecina sonríe mientras un joven le enseña algo en su móvil, en una calle encalada de un pueblo de Extremadura.',
+    'modulo-1': 'Un agricultor mira sorprendido su móvil en un olivar al atardecer.',
+    'modulo-2': 'Varias herramientas de inteligencia artificial en la pantalla de un móvil.',
+    'modulo-3': 'Una persona usa un asistente de inteligencia artificial en el móvil.',
+    'modulo-4': 'Una persona escribe en el móvil lo que le pide a la inteligencia artificial.',
+    'modulo-5': 'Una persona revisa con calma una respuesta de la inteligencia artificial.',
+    'modulo-6': 'Vecinos de un pueblo usan la inteligencia artificial en su día a día.',
+    'publico-pymes': 'Un comerciante usa el móvil en el mostrador de su tienda.',
+    'publico-mayores': 'Una mujer mayor usa el móvil en la puerta de su casa.',
+    'publico-comprension': 'Un joven en silla de ruedas escucha una lección con auriculares.',
+    'publico-entidades': 'Una formadora enseña a un grupo a usar la tecnología.',
+}
+
+
+def ruta_foto(clave):
+    for ext in ('webp', 'jpg', 'png'):
+        r = os.path.join(RAIZ, 'img', 'fotos', f'{clave}.{ext}')
+        if os.path.exists(r):
+            return r, f'/img/fotos/{clave}.{ext}'
+    return None, None
+
+
+HAY_FOTOS = any(ruta_foto(k)[0] for k in FOTOS)
+
+
+def foto_o_ilu(clave, ilu_html, clase='', hero=False, alt=None):
+    """Devuelve la foto de img/fotos/ si existe (con medidas, alt y carga correctas) o, si no, la ilustración."""
+    r, url = ruta_foto(clave)
+    wh = medidas_imagen(r) if r else None
+    if not wh:
+        return ilu_html
+    carga = 'fetchpriority="high"' if hero else 'loading="lazy"'
+    return (f'<img class="{clase} foto" src="{url}" width="{wh[0]}" height="{wh[1]}" '
+            f'alt="{e(alt if alt is not None else FOTOS.get(clave, ""))}" {carga} decoding="async">')
+
+
+MOD_ICO = {n: f'modulo-{n}' for n in range(1, 7)}
+
+
+def marco_modulo(n, clase='marco'):
+    """Marco 4:3 del módulo: su foto si existe; si no, el emblema sobre el color del módulo."""
+    f = foto_o_ilu(f'modulo-{n}', '', 'marco-foto')
+    if f:
+        return f'<div class="{clase} con-foto">{f}</div>'
+    return f'<div class="{clase}" aria-hidden="true">{ilu(MOD_ICO[n], 160, 160, "marco-emb")}</div>'
+PASO_ICO = {'Situación': 'situacion', 'Descubre': 'descubre', 'Prueba': 'prueba', 'Conecta': 'conecta', 'Comparte': 'comparte', 'Piensa': 'piensa'}
+
 # ---------- piezas comunes ----------
 LOGO = '<img src="/img/logo.svg" width="44" height="44" alt="">'
 WM = '<span class="wm">Academ<span class="i" aria-hidden="true">ı</span><span class="sr">i</span><b>Amable</b></span>'
@@ -75,11 +161,11 @@ PANEL = '''<div class="panel" id="panel" role="dialog" aria-modal="true" aria-la
 <button class="cerrar" type="button" aria-label="Cerrar">×</button>
 <h2 id="panel-t">A tu manera</h2>
 <p>Elige cómo quieres aprender. Se guarda en este móvil u ordenador.</p>
-<label class="opc"><input type="checkbox" data-opc="facil"><span><b>Lectura fácil</b><span>Frases cortas y palabras sencillas.</span></span></label>
-<label class="opc"><input type="checkbox" data-opc="oir"><span><b>Escuchar</b><span>Un botón en cada parte la lee en voz alta.</span></span></label>
-<label class="opc"><input type="checkbox" data-opc="grande"><span><b>Letra grande</b><span>Más tamaño y más espacio entre líneas.</span></span></label>
-<label class="opc"><input type="checkbox" data-opc="contraste"><span><b>Alto contraste</b><span>Colores más fuertes para ver mejor.</span></span></label>
-<label class="opc"><input type="checkbox" data-opc="pasos"><span><b>Paso a paso</b><span>En las lecciones, una parte cada vez, sin desplazarte.</span></span></label>
+<label class="opc"><input type="checkbox" data-opc="facil"><img class="opc-ico" src="/img/ilus/ico-facil.svg" width="44" height="44" alt="" loading="lazy"><span><b>Lectura fácil</b><span>Frases cortas y palabras sencillas.</span></span></label>
+<label class="opc"><input type="checkbox" data-opc="oir"><img class="opc-ico" src="/img/ilus/ico-oir.svg" width="44" height="44" alt="" loading="lazy"><span><b>Escuchar</b><span>Un botón en cada parte la lee en voz alta.</span></span></label>
+<label class="opc"><input type="checkbox" data-opc="grande"><img class="opc-ico" src="/img/ilus/ico-grande.svg" width="44" height="44" alt="" loading="lazy"><span><b>Letra grande</b><span>Más tamaño y más espacio entre líneas.</span></span></label>
+<label class="opc"><input type="checkbox" data-opc="contraste"><img class="opc-ico" src="/img/ilus/ico-contraste.svg" width="44" height="44" alt="" loading="lazy"><span><b>Alto contraste</b><span>Colores más fuertes para ver mejor.</span></span></label>
+<label class="opc"><input type="checkbox" data-opc="pasos"><img class="opc-ico" src="/img/ilus/ico-pasos.svg" width="44" height="44" alt="" loading="lazy"><span><b>Paso a paso</b><span>En las lecciones, una parte cada vez, sin desplazarte.</span></span></label>
 <p style="margin-top:18px;font-size:.92rem;color:var(--m)">Las palabras subrayadas con puntos se explican al tocarlas. Sin límites de tiempo: vas a tu ritmo.</p>
 </div></div>'''
 
@@ -100,7 +186,7 @@ PIE = f'''<footer class="pie-web"><div class="c">
 <div><h2>Aprende</h2><ul><li><a href="/cursos/iniciacion-ia/">Curso gratis de IA</a></li><li><a href="/cursos/">Todos los cursos</a></li><li><a href="/talleres/">Talleres</a></li><li><a href="/mi-aprendizaje/">Mi aprendizaje</a></li></ul></div>
 <div><h2>Contacto</h2><ul><li><a href="https://wa.me/{WA}">WhatsApp {WA_TXT}</a></li><li><a href="/entidades/">Formación para entidades y empresas</a></li><li><a href="https://euexiarural.com">Euexia Rural</a></li></ul></div>
 </div>
-<p class="leg">© {datetime.date.today().year} {ENTIDAD['nombre']} · CIF {ENTIDAD['cif']} · <a href="/aviso-legal/">Aviso legal</a> · <a href="/privacidad/">Privacidad</a> · <a href="/cookies/">Cookies</a></p>
+<p class="leg">{'Imágenes creadas con IA. ' if HAY_FOTOS else ''}© {datetime.date.today().year} {ENTIDAD['nombre']} · CIF {ENTIDAD['cif']} · <a href="/aviso-legal/">Aviso legal</a> · <a href="/privacidad/">Privacidad</a> · <a href="/cookies/">Cookies</a></p>
 </div></footer>'''
 
 
@@ -180,81 +266,91 @@ def url_lec(lid):
 
 # ---------- Portada ----------
 def portada():
-    mods = ''.join(f'<li><b>Módulo {m["n"]}</b> · {e(m["titulo"])}</li>' for m in C['modulos'])
+    tiles = ''.join(
+        f'<li class="mod-tile m{m["n"]}">{marco_modulo(m["n"])}'
+        f'<div class="mod-txt"><p class="mod-n">{ilu(MOD_ICO[m["n"]], 160, 160, "mod-ico")}Módulo {m["n"]}</p><h3><a href="{CURL}#modulo-{m["n"]}">{e(m["titulo"])}</a></h3>'
+        f'<p class="preg">{e(m["pregunta"])}</p></div></li>' for m in C['modulos'])
+    portada_curso = ''.join(ilu(MOD_ICO[m['n']], 160, 160) for m in C['modulos'])
+    manera = [('facil', 'Lectura fácil', 'Cada texto tiene su versión Fácil, escrita con frases cortas y validada por personas.'),
+              ('oir', 'Escuchar', 'Cada parte se lee en voz alta con un toque.'),
+              ('grande', 'Letra grande y alto contraste', 'Más tamaño, más espacio y colores más fuertes.'),
+              ('pasos', 'Paso a paso', 'La lección, de pantalla en pantalla, sin perderte.'),
+              ('glosario', 'Glosario al tocar', 'Las palabras difíciles se explican al tocarlas.'),
+              ('ritmo', 'A tu ritmo', 'Sin fechas ni límites de tiempo. Tu progreso se guarda solo.')]
+    manera_html = ''.join(f'<li class="ico-tar">{ilu("ico-" + k, 96, 96, "ico")}<h3>{t}</h3><p>{d}</p></li>' for k, t, d in manera)
+    ciclo = [('Situación', 'Un caso real en un vídeo de 1 minuto.'), ('Descubre', 'La idea clave en una infografía.'),
+             ('Prueba', 'Una tarea guiada con una IA de verdad.'), ('Conecta', 'Cómo se usa en el trabajo, en casa y en el pueblo.'),
+             ('Comparte', 'Enséñaselo a alguien de tu entorno.'), ('Piensa', 'Tres preguntas y una reflexión.')]
+    ciclo_html = ''.join(f'<li>{ilu("ico-" + PASO_ICO[n], 96, 96, "ico")}<b>{n}</b>{d}</li>' for n, d in ciclo)
+    publico = [('publico-pymes', 'Pymes y autónomos', 'Para ahorrar tiempo con la IA en el día a día del negocio.'),
+               ('publico-mayores', 'Personas mayores y vecinos', 'Para usar el móvil y la IA sin miedo, también en trámites.'),
+               ('publico-comprension', 'Personas con dificultades de comprensión', 'Todo en lectura fácil, con audio y paso a paso.'),
+               ('publico-entidades', 'Entidades sociales y docentes', 'Formación para equipos y materiales accesibles. <a href="/entidades/">Ver formación a medida</a>.')]
+    ilu_pub = {'publico-pymes': 'publico-negocio'}
+    publico_html = ''.join(f'<div class="tar fig"><div class="marco">{foto_o_ilu(f, ilu(ilu_pub.get(f, f), 240, 180, "fig-img"), "fig-img")}</div><div class="fig-txt"><h3>{t}</h3><p>{d}</p></div></div>' for f, t, d in publico)
+    hero_img = foto_o_ilu('portada', ilu('portada', 600, 560, 'hero-img', lazy=False), 'hero-img', hero=True)
+    nota_ia = '<p class="nota-ia">Imágenes creadas con IA.</p>' if HAY_FOTOS else ''
+    hero_cls = 'hero con-foto' if ruta_foto('portada')[0] else 'hero'
     cuerpo = f'''
-<section class="hero"><div class="c">
-<div>
+<section class="{hero_cls}"><div class="c">
+<div class="hero-txt">
 <span class="etq">Academia online · Euexia Rural</span>
 <h1>Aprende a usar la inteligencia artificial, a tu manera</h1>
 {B('<p class="ent">Cursos cortos, píldoras y talleres para entender la tecnología y sacarle partido en tu trabajo, en casa y en tu pueblo. Todo se puede leer, ver u oír, y todo tiene versión Fácil.</p>',
    '<p class="ent">Aquí aprendes a usar la tecnología. Puedes leer, ver vídeos o escuchar. Todo está también en lectura fácil.</p>')}
 <div class="acc"><a class="btn" href="{CURL}">Empezar el curso gratis</a><button class="btn lin" type="button" data-abre-panel aria-haspopup="dialog">{ICO_ATM}Aprender a tu manera</button></div>
 </div>
-<img class="hero-img" src="/img/logo.svg" width="380" height="380" alt="">
+<div class="hero-arte">{hero_img}</div>
 </div></section>
 
 <section class="sec"><div class="c">
-<div class="rej" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:center">
-<div>
+<article class="producto">
+<div class="producto-portada" aria-hidden="true"><div class="emb-rej">{portada_curso}</div><p class="producto-titulo">{e(C['titulo'])}</p><p class="producto-sub">Curso gratis desde cero</p></div>
+<div class="producto-txt">
 <span class="etq">Curso gratis</span>
-<h2 style="margin-top:.2em">{e(C['titulo'])}: {e(C['subtitulo'].lower())}</h2>
+<h2>{e(C['titulo'])}: {e(C['subtitulo'].lower())}</h2>
+<p class="pills"><span class="pill gratis">Gratis</span> <span class="pill">{C['horas']} horas</span> <span class="pill">6 módulos</span> <span class="pill">Con certificado</span></p>
 {B(f'<p>Unas {C["horas"]} horas en 6 módulos, desde cero. Vídeos de 2 a 4 minutos, infografías, tareas con casos de tu vida y certificado al terminar. Sin registro.</p>',
    '<p>Un curso gratis para empezar desde cero. Tiene 6 partes. Al final te dan un certificado.</p>')}
-<a class="btn" href="{CURL}">Ver el curso</a>
+<div class="acc"><a class="btn" href="{CURL}">Ver el curso</a></div>
 </div>
-<ul class="lista-ok">{mods}</ul>
-</div></div></section>
+</article>
+<h2 class="sub-h">Los 6 módulos del curso</h2>
+<ol class="mod-tiles">{tiles}</ol>
+</div></section>
 
-<section class="sec gris"><div class="c">
+<section class="sec banda menta"><div class="c">
 <span class="etq">A tu manera</span>
-<h2 style="margin-top:.2em">Tú decides cómo aprender</h2>
+<h2>Tú decides cómo aprender</h2>
 {B('<p>Con el botón «A tu manera», arriba a la derecha, adaptas cualquier página a ti. Se queda guardado en tu móvil.</p>',
    '<p>Pulsa el botón amarillo «A tu manera». Allí eliges cómo quieres aprender.</p>')}
-<div class="rej tres">
-<div class="tar"><h3>Lectura fácil</h3><p>Cada texto tiene su versión Fácil, escrita con frases cortas y validada por personas.</p></div>
-<div class="tar"><h3>Escuchar</h3><p>Cada parte se lee en voz alta con un toque.</p></div>
-<div class="tar"><h3>Letra grande y alto contraste</h3><p>Más tamaño, más espacio y colores más fuertes.</p></div>
-<div class="tar"><h3>Paso a paso</h3><p>La lección, de pantalla en pantalla, sin perderte.</p></div>
-<div class="tar"><h3>Glosario al tocar</h3><p>Las palabras difíciles se explican al tocarlas.</p></div>
-<div class="tar"><h3>A tu ritmo</h3><p>Sin fechas ni límites de tiempo. Tu progreso se guarda solo.</p></div>
-</div>
+<ul class="ico-rej">{manera_html}</ul>
 </div></section>
 
 <section class="sec"><div class="c">
 <span class="etq">Cómo se aprende</span>
-<h2 style="margin-top:.2em">Primero lo pruebas, luego lo entiendes</h2>
+<h2>Primero lo pruebas, luego lo entiendes</h2>
 {B('<p>Cada lección dura de 20 a 30 minutos y parte de una situación real. Lo que aprendes lo conectas con tu trabajo, tu casa y tu comunidad.</p>',
    '<p>Cada lección dura media hora o menos. Empieza con un caso de la vida real.</p>')}
-<ol class="ciclo">
-<li><b>Situación</b>Un caso real en un vídeo de 1 minuto.</li>
-<li><b>Descubre</b>La idea clave en una infografía.</li>
-<li><b>Prueba</b>Una tarea guiada con una IA de verdad.</li>
-<li><b>Conecta</b>Cómo se usa en el trabajo, en casa y en el pueblo.</li>
-<li><b>Comparte</b>Enséñaselo a alguien de tu entorno.</li>
-<li><b>Piensa</b>Tres preguntas y una reflexión.</li>
-</ol>
+<ol class="ciclo">{ciclo_html}</ol>
 </div></section>
 
-<section class="sec gris"><div class="c">
+<section class="sec banda amarilla"><div class="c">
 <span class="etq">Para quién</span>
-<h2 style="margin-top:.2em">Para cualquiera que quiera entender la tecnología</h2>
-<div class="rej">
-<div class="tar"><h3>Pymes y autónomos</h3><p>Para ahorrar tiempo con la IA en el día a día del negocio.</p></div>
-<div class="tar"><h3>Personas mayores y vecinos</h3><p>Para usar el móvil y la IA sin miedo, también en trámites.</p></div>
-<div class="tar"><h3>Personas con dificultades de comprensión</h3><p>Todo en lectura fácil, con audio y paso a paso.</p></div>
-<div class="tar"><h3>Entidades sociales y docentes</h3><p>Formación para equipos y materiales accesibles. <a href="/entidades/">Ver formación a medida</a>.</p></div>
-</div>
+<h2>Para cualquiera que quiera entender la tecnología</h2>
+<div class="rej cuatro">{publico_html}</div>
+{nota_ia}
 </div></section>
 
 <section class="sec"><div class="c">
 <span class="etq">Formatos</span>
-<h2 style="margin-top:.2em">Cursos, píldoras y talleres</h2>
-<div class="rej">
-<div class="tar"><span><span class="pill gratis">Gratis</span></span><h3>Cursos</h3><p>Varias semanas, con certificado. El primero, «IA sin miedo», es gratis.</p><div class="pie"><a href="/cursos/">Ver cursos</a></div></div>
-<div class="tar"><span><span class="pill pronto">Próximamente</span></span><h3>Píldoras</h3><p>De 10 a 20 minutos, un solo objetivo: aprender una cosa concreta y aplicarla ya.</p></div>
-<div class="tar"><span><span class="pill pronto">Próximamente</span></span><h3>Talleres</h3><p>En directo, en persona u online, con fecha. <a href="/talleres/">Avísame</a>.</p></div>
+<h2>Cursos, píldoras y talleres</h2>
+<div class="rej formatos">
+<div class="tar fmt"><span><span class="pill gratis">Gratis</span></span><h3>Cursos</h3><p>Varias semanas, con certificado. El primero, «IA sin miedo», es gratis.</p><div class="pie"><a href="/cursos/">Ver cursos</a></div></div>
+<div class="tar fmt"><span><span class="pill pronto">Próximamente</span></span><h3>Píldoras</h3><p>De 10 a 20 minutos, un solo objetivo: aprender una cosa concreta y aplicarla ya.</p></div>
+<div class="tar fmt"><span><span class="pill pronto">Próximamente</span></span><h3>Talleres</h3><p>En directo, en persona u online, con fecha. <a href="/talleres/">Avísame</a>.</p></div>
 </div>
-<p class="aviso" style="margin-top:28px">AcademiAmable es la hermana de <a href="https://esamable.es">IA-Mable</a>, las apps sencillas y accesibles para negocios de la Asociación Euexia Rural. IA-Mable hace las apps; AcademiAmable te enseña a usarlas.</p>
+<p class="aviso hermana">AcademiAmable es la hermana de <a href="https://esamable.es">IA-Mable</a>, las apps sencillas y accesibles para negocios de la Asociación Euexia Rural. IA-Mable hace las apps; AcademiAmable te enseña a usarlas.</p>
 </div></section>
 '''
     pagina('', 'AcademiAmable · Aprende a usar la IA, a tu manera. Curso gratis',
@@ -266,12 +362,14 @@ def portada():
 # ---------- Catálogo ----------
 def catalogo():
     cuerpo = f'''
-<div class="c"><p class="migas"><a href="/">Inicio</a> › Cursos</p>
+<div class="pag-cab"><div class="c"><p class="migas"><a href="/">Inicio</a> › Cursos</p>
 <h1>Cursos, píldoras y talleres</h1>
 {B('<p>Empieza por el curso gratis de IA. Iremos sumando píldoras cortas y talleres con fecha.</p>', '<p>Empieza por el curso gratis. Pronto habrá más cursos.</p>')}
+</div></div>
+<div class="c">
 <h2>Cursos</h2>
 <div class="rej">
-<article class="tar"><span><span class="pill gratis">Gratis</span> <span class="pill">{C['horas']} horas</span> <span class="pill">{C['nivel']}</span> <span class="pill">Con certificado</span></span>
+<article class="tar curso-tar"><div class="emb-rej" aria-hidden="true">{''.join(ilu(MOD_ICO[n], 160, 160) for n in range(1, 7))}</div><span><span class="pill gratis">Gratis</span> <span class="pill">{C['horas']} horas</span> <span class="pill">{C['nivel']}</span> <span class="pill">Con certificado</span></span>
 <h3><a href="{CURL}">{e(C['titulo'])}</a></h3><p>{e(C['subtitulo'])}.</p>
 <div class="pie"><a class="btn peq" href="{CURL}">Ver el curso</a></div></article>
 </div>
@@ -293,19 +391,27 @@ def ficha():
         for lid, tit, pub, _ in [(l[0], l[1], l[2], m) for l in m['lecciones']]:
             lnk = f'<a href="{url_lec(lid)}">{e(tit)}</a>' if pub else f'<span class="pronto">{e(tit)} · próximamente</span>'
             lis += f'<li><span class="est" data-lec="{lid}" role="img" aria-label="Sin terminar"></span>{lnk}</li>'
-        mods += (f'<li><h3>Módulo {m["n"]} · {e(m["titulo"])}</h3><p class="preg">{e(m["pregunta"])}</p>'
-                 f'<ul class="lecs">{lis}</ul><p style="margin:10px 0 0"><b>Tarea práctica:</b> {e(m["tarea"])}.</p></li>')
+        mids = ','.join(l[0] for l in m['lecciones'])
+        mods += (f'<li class="m{m["n"]}" id="modulo-{m["n"]}">{marco_modulo(m["n"], "mod-marco")}<div class="mod-cuerpo">'
+                 f'<h3><span class="mod-n">Módulo {m["n"]}</span> {e(m["titulo"])}</h3><p class="preg">{e(m["pregunta"])}</p>'
+                 f'<div class="mod-prog"><div class="barra peq" data-barra="{mids}" data-txt="txt-m{m["n"]}" role="presentation"><i></i></div><p id="txt-m{m["n"]}"></p></div>'
+                 f'<ul class="lecs">{lis}</ul><p class="tarea-mod"><b>Tarea práctica:</b> {e(m["tarea"])}.</p></div></li>')
     objs = ''.join(f'<li>{e(o)}</li>' for o in C['objetivos'])
     faq = ''.join(f'<details><summary>{e(q)}</summary><p>{e(a)}</p></details>' for q, a in C['faq'])
     primera = next(l for l in TODAS if l[2])
     ids = ','.join(l[0] for l in TODAS)
     cuerpo = f'''
-<div class="c"><p class="migas"><a href="/">Inicio</a> › <a href="/cursos/">Cursos</a> › {e(C['titulo'])}</p>
-<span class="pill gratis">Gratis</span> <span class="pill">{C['horas']} horas</span> <span class="pill">6 módulos</span> <span class="pill">Con certificado</span>
+<div class="curso-cab"><div class="c">
+<div class="curso-cab-txt">
+<p class="migas"><a href="/">Inicio</a> › <a href="/cursos/">Cursos</a> › {e(C['titulo'])}</p>
+<p class="pills"><span class="pill gratis">Gratis</span> <span class="pill">{C['horas']} horas</span> <span class="pill">6 módulos</span> <span class="pill">Con certificado</span></p>
 <h1>{e(C['titulo'])}: curso gratis de inteligencia artificial desde cero</h1>
-{B('<p style="font-size:1.15rem">' + e(C['descripcion']) + '</p>', '<p>' + e(C['facil']) + '</p>')}
+{B('<p class="ent">' + e(C['descripcion']) + '</p>', '<p>' + e(C['facil']) + '</p>')}
 <div class="acc"><a class="btn" href="{url_lec(primera[0])}">Empezar por la lección 1.1</a><a class="btn lin" href="{CURL}mapa/">Ver el mapa del curso</a></div>
-<div style="max-width:420px;margin-top:22px"><p id="txt-prog" style="margin:0 0 6px">Tu progreso</p><div class="barra" data-barra="{ids}" data-txt="txt-prog" role="presentation"><i></i></div></div>
+</div>
+<div class="prog-tar"><div class="emb-rej" aria-hidden="true">{''.join(ilu(MOD_ICO[n], 160, 160) for n in range(1, 7))}</div><p id="txt-prog" class="prog-txt">Tu progreso</p><div class="barra" data-barra="{ids}" data-txt="txt-prog" role="presentation"><i></i></div></div>
+</div></div>
+<div class="c">
 <h2>Qué vas a aprender</h2><ul class="lista-ok">{objs}</ul>
 <h2>Módulos y lecciones</h2>
 <p>Cada lección sigue el mismo ciclo: situación, descubre, prueba, conecta, comparte y piensa. Las lecciones se van abriendo una a una.</p>
@@ -347,7 +453,8 @@ def leccion(Lc):
             else:
                 cls = {'info': 'info', 'tarea': 'tarea', 'dos': 'info', 'texto': ''}[tipo]
                 contenido += B(bl[1], bl[2], clase=cls)
-        pasos_html += (f'<li class="paso" id="paso-{i}"><h2><span class="num" aria-hidden="true">{i}</span>{e(nombre)}</h2>{contenido}</li>')
+        ico = ilu('ico-' + PASO_ICO[nombre], 96, 96) if nombre in PASO_ICO else ''
+        pasos_html += (f'<li class="paso" id="paso-{i}"><h2><span class="num" aria-hidden="true">{ico}<i>{i}</i></span>{e(nombre)}</h2>{contenido}</li>')
     conecta = ' y '.join(
         (f'<a href="{url_lec(lid)}">{e(t)}</a>' if lid in IDS_PUB else f'«{e(t)}» (próximamente)') for lid, t in Lc['conecta'])
     idx = [l[0] for l in TODAS].index(Lc['id'])
@@ -359,11 +466,15 @@ def leccion(Lc):
             '<button class="btn peq" type="button" data-paso="1">Siguiente</button></div>')
     borrador = '' if Lc['validada'] else '<p class="aviso" style="margin-top:14px"><b>Lección en prueba.</b> La versión Fácil está pendiente de validar con personas.</p>'
     cuerpo = f'''
-<div class="lec-cab"><div class="c estrecho">
-<p class="migas" style="margin-top:0"><a href="{CURL}">{e(C['titulo'])}</a> › Módulo {m['n']} · {e(m['titulo'])}</p>
+<div class="lec-cab m{m['n']}"><div class="c lec-cab-rej">
+<div class="lec-cab-txt">
+<p class="migas"><a href="{CURL}">{e(C['titulo'])}</a> › Módulo {m['n']} · {e(m['titulo'])}</p>
 <h1>{Lc['num']} · {e(Lc['titulo'])}</h1>
-<p style="margin:0">{Lc['minutos']} minutos · 6 pasos · <button class="g" type="button" data-def="Pulsa el botón amarillo «A tu manera» para leer en fácil, escuchar o ver la lección paso a paso.">¿Cómo la quieres?</button></p>
+<p class="lec-meta">{Lc['minutos']} minutos · 6 pasos · <button class="g" type="button" data-def="Pulsa el botón amarillo «A tu manera» para leer en fácil, escuchar o ver la lección paso a paso.">¿Cómo la quieres?</button></p>
+<ol class="mini-ciclo" aria-hidden="true">{''.join(f'<li>{ilu("ico-" + PASO_ICO[n], 96, 96)}</li>' for n, _ in Lc['pasos'] if n in PASO_ICO)}</ol>
 {borrador}
+</div>
+{marco_modulo(m['n'], 'lec-marco')}
 </div></div>
 <div class="c estrecho">
 {navp}
@@ -386,7 +497,7 @@ def leccion(Lc):
 # ---------- Mapa del curso ----------
 def mapa():
     mods = C['modulos']
-    COLW, X0, Y0, DY = 165, 85, 120, 92
+    COLW, X0, Y0, DY = 165, 85, 168, 92
     W = X0 * 2 + COLW * (len(mods) - 1)
     Hh = Y0 + DY * 3 + 70
     pos = {}
@@ -394,6 +505,12 @@ def mapa():
         k = len(m['lecciones'])
         for li, l in enumerate(m['lecciones']):
             pos[l[0]] = (X0 + mi * COLW, Y0 + li * DY + (4 - k) * DY / 2)
+    bandas = ''
+    for mi, m in enumerate(mods):
+        x = X0 + mi * COLW
+        fuerte, palido = ilustraciones.MODULOS[mi]
+        bandas += (f'<rect x="{x - COLW / 2 + 6:.0f}" y="8" width="{COLW - 12}" height="{Hh - 16}" rx="24" fill="{palido}"/>'
+                   f'<image href="/img/ilus/{MOD_ICO[m["n"]]}.svg" x="{x - 24}" y="20" width="48" height="48"/>')
     lineas = ''
     for a, b in C['conexiones']:
         (x1, y1), (x2, y2) = pos[a], pos[b]
@@ -404,12 +521,12 @@ def mapa():
                 (x1, y1), (x2, y2) = (x2, y2), (x1, y1)
             mx = (x1 + x2) / 2
             d = f'M{x1:.0f} {y1:.0f} C{mx:.0f} {y1:.0f} {mx:.0f} {y2:.0f} {x2:.0f} {y2:.0f}'
-        lineas += f'<path d="{d}" fill="none" stroke="#C9C9C2" stroke-width="2"/>'
+        lineas += f'<path d="{d}" fill="none" stroke="#9A9A94" stroke-width="2" stroke-dasharray="1 0" opacity=".55"/>'
     nodos = ''
     for mi, m in enumerate(mods):
         x = X0 + mi * COLW
-        nodos += (f'<text x="{x}" y="38" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="15" fill="#0B7A7C">Módulo {m["n"]}</text>'
-                  f'<text x="{x}" y="62" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="15" fill="#141414">{e(m["titulo"])}</text>')
+        nodos += (f'<text x="{x}" y="92" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="14" fill="#08605F">Módulo {m["n"]}</text>'
+                  f'<text x="{x}" y="114" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="15" fill="#141414">{e(m["titulo"])}</text>')
         for l in m['lecciones']:
             px, py = pos[l[0]]
             c = f'<circle cx="{px:.0f}" cy="{py:.0f}" r="16" fill="{"#0B7A7C" if l[2] else "#FFFFFF"}" stroke="#0B7A7C" stroke-width="3"/>'
@@ -420,14 +537,16 @@ def mapa():
             else:
                 nodos += f'<g>{c}{t}<title>{e(l[1])} (próximamente)</title></g>'
     svg = (f'<svg viewBox="0 0 {W} {Hh}" role="img" aria-labelledby="mapa-t"><title id="mapa-t">Mapa del curso: las lecciones de los 6 módulos y cómo se conectan</title>'
-           f'{lineas}{nodos}</svg>')
+           f'{bandas}{lineas}{nodos}</svg>')
     lista = ''.join(f'<li><b>Módulo {m["n"]} · {e(m["titulo"])}</b>: ' + '; '.join(
         (f'<a href="{url_lec(l[0])}">{e(l[1])}</a>' if l[2] else e(l[1])) for l in m['lecciones']) + '</li>' for m in C['modulos'])
     cuerpo = f'''
-<div class="c"><p class="migas"><a href="/">Inicio</a> › <a href="{CURL}">{e(C['titulo'])}</a> › Mapa</p>
+<div class="pag-cab"><div class="c"><p class="migas"><a href="/">Inicio</a> › <a href="{CURL}">{e(C['titulo'])}</a> › Mapa</p>
 <h1>Mapa del curso</h1>
 {B('<p>Nada se aprende suelto. Cada punto es una lección y cada línea une las que se relacionan. Los puntos verdes ya están abiertos: tócalos para entrar.</p>',
    '<p>Cada punto es una lección. Las líneas unen lecciones que se parecen. Los puntos verdes ya se pueden hacer.</p>')}
+</div></div>
+<div class="c">
 <div class="mapa">{svg}</div>
 <h2>Las lecciones en lista</h2><ul>{lista}</ul>
 </div>'''
@@ -438,22 +557,25 @@ def mapa():
 # ---------- Mi aprendizaje ----------
 def mi_aprendizaje():
     insignias = ''.join(
-        f'<div class="tar" data-insignia="{",".join(l[0] for l in m["lecciones"])}" hidden><span><span class="pill gratis">Insignia</span></span><h3>Módulo {m["n"]}: {e(m["titulo"])}</h3><p>Has terminado todas sus lecciones.</p></div>'
+        f'<div class="tar insignia m{m["n"]}" data-insignia="{",".join(l[0] for l in m["lecciones"])}" hidden>{ilu(MOD_ICO[m["n"]], 160, 160, "ins-emb")}<span><span class="pill gratis">Insignia</span></span><h3>Módulo {m["n"]}: {e(m["titulo"])}</h3><p>Has terminado todas sus lecciones.</p></div>'
         for m in C['modulos'])
     ids = ','.join(l[0] for l in TODAS)
     cuerpo = f'''
-<div class="c estrecho"><h1>Mi aprendizaje</h1>
+<div class="pag-cab"><div class="c estrecho"><h1>Mi aprendizaje</h1>
 {B('<p>Aquí ves lo que llevas hecho. Tu progreso se guarda solo en este móvil u ordenador: no hace falta registrarse y nadie más lo ve.</p>',
    '<p>Aquí ves lo que has hecho. Se guarda en tu móvil. No necesitas usuario ni contraseña.</p>')}
+</div></div>
+<div class="c estrecho">
+<section class="prog-tar ancho"><div class="emb-rej" aria-hidden="true">{''.join(ilu(MOD_ICO[n], 160, 160) for n in range(1, 7))}</div>
 <h2>{e(C['titulo'])}</h2>
-<p id="txt-mi" style="margin:0 0 6px"></p><div class="barra" data-barra="{ids}" data-txt="txt-mi"><i></i></div>
-<p style="margin-top:14px"><a class="btn peq" href="{CURL}">Seguir con el curso</a></p>
-<p id="sin-progreso" class="aviso">Todavía no has terminado ninguna lección. <a href="{url_lec(IDS_PUB[0])}">Empieza por la primera</a>.</p>
+<p id="txt-mi" class="prog-txt"></p><div class="barra" data-barra="{ids}" data-txt="txt-mi"><i></i></div>
+<p class="prog-acc"><a class="btn peq" href="{CURL}">Seguir con el curso</a></p></section>
+<div id="sin-progreso" class="vacio">{ilu('vacio', 240, 200)}<p>Todavía no has terminado ninguna lección. <a href="{url_lec(IDS_PUB[0])}">Empieza por la primera</a>.</p></div>
 <h2>Insignias</h2><div class="rej">{insignias}</div>
 <h2>Certificado</h2><p>Cuando termines los 6 módulos, aquí podrás descargar tu certificado en PDF con tu nombre y un código para comprobarlo.</p>
 <h2>Seguir en otro dispositivo</h2>
 <p>Copia tu código y pégalo en el otro móvil u ordenador, en esta misma página.</p>
-<p><label for="codigo"><b>Tu código</b></label><br><textarea id="codigo" rows="3" style="width:100%;font:inherit;padding:12px;border-radius:12px;border:2px solid var(--l)"></textarea></p>
+<p><label for="codigo"><b>Tu código</b></label><br><textarea id="codigo" rows="3"></textarea></p>
 <div class="acc"><button class="btn" type="button" id="exportar">Copiar mi código</button><button class="btn lin" type="button" id="importar">Cargar un código</button></div>
 <p id="msg-cod" role="status" aria-live="polite" style="font-weight:700;margin-top:10px"></p>
 </div>'''
@@ -465,9 +587,10 @@ def mi_aprendizaje():
 def talleres():
     msg = 'Hola, quiero que me aviséis de los próximos talleres de AcademiAmable.'
     cuerpo = f'''
-<div class="c estrecho"><p class="migas"><a href="/">Inicio</a> › Talleres</p><h1>Talleres en directo</h1>
+<div class="pag-cab"><div class="c estrecho"><p class="migas"><a href="/">Inicio</a> › Talleres</p><h1>Talleres en directo</h1>
 {B('<p>Sesiones de 1 a 2 horas, en persona en Jerez de los Caballeros y su comarca, u online. Grupos pequeños, mucha práctica y versión Fácil de todos los materiales.</p>',
    '<p>Los talleres son clases en directo. Pueden ser en persona o por internet. Son grupos pequeños.</p>')}
+</div></div><div class="c estrecho">
 <h2>Próximos talleres</h2>
 <p class="aviso">Estamos preparando el calendario. Escríbenos y te avisamos el primero.</p>
 <a class="btn" href="https://wa.me/{WA}?text={msg.replace(' ', '%20')}">Avisadme por WhatsApp</a>
@@ -482,10 +605,11 @@ def talleres():
 def entidades():
     msg = 'Hola, queremos información sobre formación a medida de AcademiAmable para nuestro equipo.'
     cuerpo = f'''
-<div class="c estrecho"><p class="migas"><a href="/">Inicio</a> › Para entidades y empresas</p>
+<div class="pag-cab"><div class="c estrecho"><p class="migas"><a href="/">Inicio</a> › Para entidades y empresas</p>
 <h1>Formación a medida para tu equipo</h1>
 {B('<p>Llevamos AcademiAmable a tu asociación, empresa, centro educativo o ayuntamiento: formación en IA y tecnología adaptada a vuestro trabajo, con casos reales y materiales en lectura fácil.</p>',
    '<p>Damos clases a equipos de trabajo. Las clases se adaptan a cada equipo. Los materiales están en lectura fácil.</p>')}
+</div></div><div class="c estrecho">
 <h2>Qué incluye</h2>
 <ul class="lista-ok"><li>Diagnóstico corto de qué necesita tu equipo.</li><li>Sesiones en persona u online con tareas sobre vuestro propio trabajo.</li><li>Materiales accesibles: versión Fácil, audio e infografías.</li><li>Acceso a los cursos de la Academia para seguir practicando.</li></ul>
 <h2>Para quién</h2><p>Entidades sociales, pymes, comercios, docentes, centros de mayores y ayuntamientos. Precio especial para entidades sociales y para clientes de <a href="https://esamable.es">IA-Mable</a>.</p>
@@ -520,7 +644,7 @@ def legal():
 
 def error404():
     pagina('404', 'Página no encontrada | AcademiAmable', 'Esta página no existe.',
-           '<div class="c estrecho"><h1>Esta página no existe</h1><p>Puede que la dirección esté mal escrita o que la lección todavía no esté publicada.</p><a class="btn" href="/">Ir al inicio</a></div>',
+           '<div class="c estrecho e404">' + ilu('404', 320, 240, lazy=False) + '<h1>Esta página no existe</h1><p>Puede que la dirección esté mal escrita o que la lección todavía no esté publicada.</p><a class="btn" href="/">Ir al inicio</a></div>',
            noindex=True)
     os.replace(os.path.join(RAIZ, '404', 'index.html'), os.path.join(RAIZ, '404.html'))
     os.rmdir(os.path.join(RAIZ, '404'))
@@ -567,6 +691,7 @@ self.addEventListener('fetch', e => {{
 
 
 if __name__ == '__main__':
+    ilustraciones.generar()
     portada(); catalogo(); ficha()
     for Lc in LECCIONES.values():
         leccion(Lc)
