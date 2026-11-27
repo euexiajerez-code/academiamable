@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'La IA que ya usas sin saberlo',
     'minutos': 20,
     'descripcion': 'La IA que ya usas sin saberlo: en el móvil, los mapas, el correo y la tele. Descubre dónde está y cuida tus datos. Lección 1.3 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

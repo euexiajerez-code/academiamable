@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'Asistentes y agentes',
     'minutos': 25,
     'descripcion': 'Asistentes y agentes de IA: en qué se diferencian, qué pueden hacer por ti y qué no deberías dejarles nunca. Lección 2.4 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

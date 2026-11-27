@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'IA que reconoce y clasifica',
     'minutos': 25,
     'descripcion': 'IA que reconoce y clasifica: plantas, textos, caras y voces. Cómo usar Google Lens con cabeza y respeto. Lección 2.3 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

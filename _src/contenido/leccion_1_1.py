@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'Qué es y qué no es la IA',
     'minutos': 25,
     'descripcion': 'Qué es la inteligencia artificial, explicado sin tecnicismos: qué hace, qué no hace y por qué no es un robot que piensa. Lección 1.1 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

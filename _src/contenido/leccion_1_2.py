@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'Cómo «aprende» una IA',
     'minutos': 25,
     'descripcion': 'Cómo aprende una inteligencia artificial: con ejemplos, no con reglas, y por qué a veces aprende mal. Lección 1.2 del curso gratis IA sin miedo, desde cero.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'IA que crea imágenes, vídeo y voz',
     'minutos': 25,
     'descripcion': 'IA que crea imágenes, vídeo y voz: qué puede hacer, cómo pedírselo y qué cuidar para no engañar ni engañarte. Lección 2.2 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',

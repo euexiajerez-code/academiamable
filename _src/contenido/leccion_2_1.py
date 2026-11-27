@@ -10,7 +10,7 @@ LECCION = {
     'titulo': 'IA que conversa',
     'minutos': 25,
     'descripcion': 'Qué es una IA que conversa, como ChatGPT o Gemini: para qué sirve, en qué falla y cómo hablar con ella paso a paso. Lección 2.1 del curso gratis IA sin miedo.',
-    'validada': False,
+    'validada': True,
     'pasos': [
         ('Situación', [
             ('texto',
