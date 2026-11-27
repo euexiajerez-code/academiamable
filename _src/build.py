@@ -96,17 +96,17 @@ def medidas_imagen(ruta):
 # Huecos para fotos (opcionales). Si el archivo existe en img/fotos/ (.webp, .jpg o .png), se usa
 # en lugar de la ilustración. El texto alternativo describe la foto: cámbialo aquí si cambias la foto.
 FOTOS = {
-    'portada': 'Una vecina sonríe mientras un joven le enseña algo en su móvil, en una calle encalada de un pueblo de Extremadura.',
-    'modulo-1': 'Un agricultor mira sorprendido su móvil en un olivar al atardecer.',
-    'modulo-2': 'Varias herramientas de inteligencia artificial en la pantalla de un móvil.',
-    'modulo-3': 'Una persona usa un asistente de inteligencia artificial en el móvil.',
-    'modulo-4': 'Una persona escribe en el móvil lo que le pide a la inteligencia artificial.',
-    'modulo-5': 'Una persona revisa con calma una respuesta de la inteligencia artificial.',
-    'modulo-6': 'Vecinos de un pueblo usan la inteligencia artificial en su día a día.',
-    'publico-pymes': 'Un comerciante usa el móvil en el mostrador de su tienda.',
-    'publico-mayores': 'Una mujer mayor usa el móvil en la puerta de su casa.',
-    'publico-comprension': 'Un joven en silla de ruedas escucha una lección con auriculares.',
-    'publico-entidades': 'Una formadora enseña a un grupo a usar la tecnología.',
+    'portada': 'Una vecina y un joven miran juntos un móvil, sentados en un poyete de una calle encalada de un pueblo de Extremadura.',
+    'modulo-1': 'Un agricultor mira sorprendido su móvil en un olivar.',
+    'modulo-2': 'El dueño de un bar habla con el asistente de voz de su móvil detrás de la barra.',
+    'modulo-3': 'Una peluquera consulta el móvil y una tablet en su peluquería.',
+    'modulo-4': 'Un chico escribe en un portátil en la mesa de la cocina, con una libreta al lado.',
+    'modulo-5': 'Un matrimonio mayor revisa con desconfianza un mensaje en el móvil, sentado en el sofá.',
+    'modulo-6': 'Vecinos de varias edades, uno en silla de ruedas, trabajan juntos con un portátil en un local municipal.',
+    'publico-pymes': 'La dueña de una tienda de productos locales atiende un pedido con el móvil detrás del mostrador.',
+    'publico-mayores': 'Dos amigas mayores ríen mirando una tablet en un banco de la plaza del pueblo.',
+    'publico-comprension': 'Un joven con síndrome de Down usa una tablet, acompañado por una educadora.',
+    'publico-entidades': 'Una formadora da un taller práctico con el móvil a un grupo de adultos.',
 }
 
 
