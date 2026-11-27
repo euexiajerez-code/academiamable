@@ -1,0 +1,17 @@
+# AcademiAmable
+
+> AcademiAmable (academiamable.es) es la academia online de la Asociación Euexia Rural, entidad social de Jerez de los Caballeros (Badajoz, Extremadura). Ofrece cursos, píldoras y talleres para aprender a usar la inteligencia artificial y la tecnología. Todo tiene versión en lectura fácil validada por personas, audio y opciones de accesibilidad. El primer curso, «IA sin miedo», es gratis, sin registro y con certificado. Es la hermana formativa de IA-Mable (esamable.es).
+
+Contacto: WhatsApp +34 639 924 211 · https://academiamable.es
+
+## Páginas
+- [AcademiAmable · Aprende a usar la IA, a tu manera. Curso gratis](https://academiamable.es/): Academia online de Euexia Rural: curso gratis de inteligencia artificial desde cero, píldoras y talleres. Todo en versión Fácil, con audio y a tu ritmo.
+- [Cursos de IA y tecnología en versión Fácil | AcademiAmable](https://academiamable.es/cursos/): Catálogo de AcademiAmable: curso gratis de inteligencia artificial desde cero, píldoras de 10 a 20 minutos y talleres. Todo con versión Fácil.
+- [Curso de IA gratis desde cero, en versión Fácil | AcademiAmable](https://academiamable.es/cursos/iniciacion-ia/): Curso gratis de inteligencia artificial para empezar desde cero: qué es, tipos, ChatGPT y otras, cómo pedirle bien y usarla con cabeza. Versión Fácil y certificado.
+- [Qué es y qué no es la IA: explicado fácil | Curso de IA gratis](https://academiamable.es/cursos/iniciacion-ia/que-es-y-que-no-es/): Qué es la inteligencia artificial, explicado sin tecnicismos: qué hace, qué no hace y por qué no es un robot que piensa. Lección 1.1 del curso gratis IA sin miedo.
+- [Mapa del curso de IA gratis | AcademiAmable](https://academiamable.es/cursos/iniciacion-ia/mapa/): Las lecciones del curso gratis IA sin miedo y cómo se conectan entre sí, de un vistazo.
+- [Talleres de inteligencia artificial en Extremadura | AcademiAmable](https://academiamable.es/talleres/): Talleres prácticos de IA en Jerez de los Caballeros, su comarca y online. Grupos pequeños y materiales en lectura fácil.
+- [Formación en IA para entidades y empresas | AcademiAmable](https://academiamable.es/entidades/): Formación a medida en inteligencia artificial para asociaciones, empresas, docentes y ayuntamientos, con materiales en lectura fácil.
+- [Aviso legal | AcademiAmable](https://academiamable.es/aviso-legal/): Datos de la entidad titular de AcademiAmable y condiciones de uso.
+- [Política de privacidad | AcademiAmable](https://academiamable.es/privacidad/): Cómo trata AcademiAmable tus datos: sin registro y con tu progreso guardado solo en tu dispositivo.
+- [Política de cookies | AcademiAmable](https://academiamable.es/cookies/): AcademiAmable no usa cookies de seguimiento: solo almacenamiento local técnico para tu progreso.

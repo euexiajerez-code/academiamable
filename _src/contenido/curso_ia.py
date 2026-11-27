@@ -1,0 +1,85 @@
+# Curso «IA sin miedo» (Iniciación a la IA). Estructura y estado de cada lección.
+# publicada=True solo cuando la lección está escrita y validada en versión Fácil.
+
+CURSO = {
+    'slug': 'iniciacion-ia',
+    'titulo': 'IA sin miedo',
+    'subtitulo': 'Qué es la inteligencia artificial, cómo usarla bien y para qué te sirve',
+    'precio': 'Gratis',
+    'horas': 6,
+    'nivel': 'Desde cero',
+    'descripcion': 'Curso gratis de iniciación a la inteligencia artificial: qué es, qué tipos hay, cuáles se usan más, cómo pedirle bien las cosas y cómo usarla con cabeza. Con versión Fácil, vídeos cortos, infografías, tareas con casos de tu vida y certificado.',
+    'facil': 'Un curso gratis para aprender qué es la inteligencia artificial. Aprendes a usarla bien y sin miedo. Puedes leerlo en fácil o escucharlo.',
+    'objetivos': [
+        'Explicar con tus palabras qué es la IA y qué no es.',
+        'Distinguir los tipos de IA y saber cuál usar para cada cosa.',
+        'Pedirle a una IA lo que quieres y conseguir buenas respuestas.',
+        'Detectar errores, bulos y riesgos para tus datos.',
+        'Aplicar la IA a un problema real de tu trabajo, tu casa o tu pueblo.',
+    ],
+    'modulos': [
+        {'n': 1, 'titulo': '¿Qué es la IA?', 'pregunta': '¿Es magia, es un robot, me va a quitar el trabajo?',
+         'tarea': 'Apunta 5 sitios de tu día a día donde ya hay IA',
+         'lecciones': [
+             ('que-es-y-que-no-es', 'Qué es y qué no es la IA', True),
+             ('como-aprende', 'Cómo «aprende» una IA', False),
+             ('ia-que-ya-usas', 'La IA que ya usas sin saberlo', False)]},
+        {'n': 2, 'titulo': 'Tipos de IA', 'pregunta': '¿Todas las IA son ChatGPT?',
+         'tarea': 'Clasifica 10 herramientas en su tipo (juego de arrastrar)',
+         'lecciones': [
+             ('ia-que-conversa', 'IA que conversa', False),
+             ('ia-que-crea', 'IA que crea imágenes, vídeo y voz', False),
+             ('ia-que-reconoce', 'IA que reconoce y clasifica', False),
+             ('asistentes-y-agentes', 'Asistentes y agentes', False)]},
+        {'n': 3, 'titulo': 'Las más usadas', 'pregunta': '¿Cuál uso y para qué?',
+         'tarea': 'Haz la misma pregunta a dos IA y compara las respuestas',
+         'lecciones': [
+             ('asistentes-de-chat', 'ChatGPT, Claude, Gemini y Copilot', False),
+             ('imagen-y-video', 'Imágenes y vídeo', False),
+             ('voz', 'Voz', False),
+             ('gratis-o-de-pago', '¿Gratis o de pago?', False)]},
+        {'n': 4, 'titulo': 'Pedir bien', 'pregunta': '¿Por qué a veces me contesta cualquier cosa?',
+         'tarea': 'Consigue con IA un cartel o un mensaje para tu negocio o tu asociación',
+         'lecciones': [
+             ('que-es-un-prompt', 'Qué es un «prompt»', False),
+             ('la-formula', 'La fórmula: quién eres, qué quieres, cómo lo quieres', False),
+             ('corregir-y-repreguntar', 'Corregir y repreguntar', False)]},
+        {'n': 5, 'titulo': 'Usarla con cabeza', 'pregunta': '¿Me puedo fiar? ¿Es seguro?',
+         'tarea': 'Detecta el error en 5 respuestas de IA y haz tu lista de lo que no compartir nunca',
+         'lecciones': [
+             ('errores-e-invenciones', 'Errores e invenciones', False),
+             ('datos-y-privacidad', 'Datos personales y privacidad', False),
+             ('derechos-de-autor', 'Derechos de autor', False),
+             ('bulos-y-videos-falsos', 'Bulos y vídeos falsos', False)]},
+        {'n': 6, 'titulo': 'La IA en tu vida', 'pregunta': '¿Y ahora qué hago con esto?',
+         'tarea': 'Proyecto final: resuelve un problema real tuyo con IA y cuéntalo en 1 minuto',
+         'lecciones': [
+             ('en-el-trabajo', 'En el trabajo y el negocio', False),
+             ('en-casa-y-tramites', 'En casa y en trámites', False),
+             ('en-el-pueblo', 'En el pueblo y la asociación', False),
+             ('tu-plan', 'Tu plan personal', False)]},
+    ],
+    # Conexiones entre lecciones para el mapa del curso (ids de lección)
+    'conexiones': [
+        ('que-es-y-que-no-es', 'como-aprende'), ('como-aprende', 'ia-que-ya-usas'),
+        ('que-es-y-que-no-es', 'errores-e-invenciones'), ('como-aprende', 'errores-e-invenciones'),
+        ('ia-que-ya-usas', 'ia-que-reconoce'), ('ia-que-conversa', 'asistentes-de-chat'),
+        ('ia-que-crea', 'imagen-y-video'), ('ia-que-crea', 'voz'), ('asistentes-y-agentes', 'en-el-trabajo'),
+        ('asistentes-de-chat', 'que-es-un-prompt'), ('que-es-un-prompt', 'la-formula'),
+        ('la-formula', 'corregir-y-repreguntar'), ('corregir-y-repreguntar', 'errores-e-invenciones'),
+        ('imagen-y-video', 'bulos-y-videos-falsos'), ('voz', 'bulos-y-videos-falsos'),
+        ('imagen-y-video', 'derechos-de-autor'), ('datos-y-privacidad', 'en-casa-y-tramites'),
+        ('gratis-o-de-pago', 'datos-y-privacidad'), ('la-formula', 'en-el-trabajo'),
+        ('la-formula', 'en-el-pueblo'), ('en-el-trabajo', 'tu-plan'), ('en-casa-y-tramites', 'tu-plan'),
+        ('en-el-pueblo', 'tu-plan'), ('ia-que-ya-usas', 'en-casa-y-tramites'),
+    ],
+    'faq': [
+        ('¿El curso es gratis de verdad?', 'Sí. El curso de Iniciación a la IA es gratis, sin registro y sin letra pequeña. Solo necesitas un móvil u ordenador con internet.'),
+        ('¿Necesito saber informática?', 'No. Empieza desde cero. Si sabes usar WhatsApp, puedes hacer el curso.'),
+        ('¿Qué es la versión Fácil?', 'Cada texto tiene una versión en lectura fácil, con frases cortas y palabras sencillas, validada por personas. La activas en el botón «A tu manera». También puedes escuchar cada parte en voz alta.'),
+        ('¿Cuánto dura?', 'Unas 6 horas en total: 6 módulos de 3 o 4 lecciones de 20 a 30 minutos. Vas a tu ritmo, sin fechas ni límites de tiempo.'),
+        ('¿Me dan certificado?', 'Sí. Al terminar los 6 módulos descargas un certificado en PDF de AcademiAmable con tu nombre y un código que cualquiera puede comprobar en esta web.'),
+        ('¿Tengo que pagar alguna IA para hacer las tareas?', 'No. Todas las tareas se pueden hacer con las versiones gratis de las herramientas.'),
+        ('¿Dónde se guarda mi progreso?', 'En tu propio móvil u ordenador, no en ningún servidor. Si cambias de dispositivo, en «Mi aprendizaje» tienes un código para llevarte tu progreso.'),
+    ],
+}
