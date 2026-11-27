@@ -100,21 +100,25 @@
 
   /* Progreso */
   var prog = LS.get('aa-progreso', { lecciones: {}, cuestionarios: {} });
+  ['lecciones', 'cuestionarios', 'labs', 'meta', 'leitner', 'estado'].forEach(function (k) { prog[k] = prog[k] || {}; });
   function guardarProg() { LS.set('aa-progreso', prog); pintarProgreso(); }
+  /* labs.js usa este mismo objeto para guardar sus resultados */
+  window.AA = { prog: prog, guardar: guardarProg };
 
   /* Cuestionarios corregidos al momento */
   document.querySelectorAll('form.quiz').forEach(function (f) {
     f.addEventListener('submit', function (e) {
       e.preventDefault();
-      var total = 0, bien = 0;
-      f.querySelectorAll('fieldset').forEach(function (fs) {
+      var total = 0, bien = 0, lec = f.dataset.id, m = prog.meta[lec] = prog.meta[lec] || {};
+      f.querySelectorAll('fieldset.q').forEach(function (fs) {
         total++;
-        var marcada = fs.querySelector('input:checked');
-        fs.querySelectorAll('label').forEach(function (l) { l.classList.remove('bien', 'mal'); });
+        var q = fs.dataset.q, marcada = fs.querySelector('input[name="q' + q + '"]:checked'), conf = fs.querySelector('input[name="q' + q + 'c"]:checked');
+        fs.querySelectorAll('label').forEach(function (l) { l.classList.remove('bien', 'mal'); var s = l.querySelector('.marca'); if (s) s.remove(); });
         var ok = fs.querySelector('input[data-ok]');
         if (marcada) {
-          if (marcada === ok) { bien++; marcada.parentNode.classList.add('bien'); }
-          else { marcada.parentNode.classList.add('mal'); ok.parentNode.classList.add('bien'); }
+          if (marcada === ok) { bien++; marca(marcada.parentNode, 'bien', 'Correcta'); }
+          else { marca(marcada.parentNode, 'mal', 'Tu respuesta, no es la correcta'); marca(ok.parentNode, 'bien', 'La correcta'); }
+          m['quiz-' + q] = { p: fs.querySelector('legend').textContent.replace(/^\d+\.\s*/, ''), ok: marcada === ok, c: conf ? conf.value : null };
         }
         var ex = fs.querySelector('.expl');
         if (ex) ex.hidden = !marcada;
@@ -126,6 +130,56 @@
       guardarProg();
     });
   });
+
+  function marca(label, clase, txt) {
+    label.classList.add(clase);
+    var s = document.createElement('span'); s.className = 'marca'; s.textContent = txt; label.appendChild(s);
+  }
+
+  /* Dominio de una lección (0-100): media de las preguntas de «Piensa» y de sus laboratorios */
+  function dominio(lec, labs) {
+    var v = [prog.cuestionarios[lec] || 0].concat(labs.map(function (l) { return prog.labs[l] || 0; }));
+    return Math.round(100 * v.reduce(function (a, b) { return a + b; }, 0) / v.length);
+  }
+  function lista(el) { return (el.dataset.labs || '').split(',').filter(Boolean); }
+  function pintarDominio() {
+    document.querySelectorAll('[data-resumen]').forEach(function (r) {
+      var lec = r.dataset.resumen, labs = lista(r), p = dominio(lec, labs);
+      r.querySelector('[data-dom-pc]').textContent = p + ' %';
+      r.querySelector('.barra i').style.width = p + '%';
+      r.querySelectorAll('[data-res-lab]').forEach(function (li) {
+        var id = li.dataset.resLab, v = id === 'quiz' ? prog.cuestionarios[lec] : prog.labs[id], hecho = v != null;
+        li.querySelector('.est').classList.toggle('hecha', hecho);
+        li.querySelector('.est').setAttribute('aria-label', hecho ? 'Hecho' : 'Sin hacer');
+        li.querySelector('.res-nota').textContent = hecho ? Math.round(v * 100) + ' %' : '';
+      });
+      var mc = r.querySelector('[data-metacog]'), m = prog.meta[lec] || {}, hay = false;
+      mc.querySelectorAll('ul').forEach(function (u) { u.innerHTML = ''; });
+      Object.keys(m).forEach(function (k) {
+        var x = m[k]; if (!x.c) return; hay = true;
+        var g = x.ok && x.c === 'seguro' ? 'a' : x.ok ? 'b' : 'c';
+        var li = document.createElement('li'); li.textContent = x.p + (!x.ok && x.c === 'seguro' ? ' (estabas seguro)' : '');
+        mc.querySelector('.mc-' + g + ' ul').appendChild(li);
+      });
+      mc.querySelectorAll('.mc').forEach(function (d) { d.hidden = !d.querySelector('li'); });
+      mc.hidden = !hay; r.querySelector('[data-mc-vacio]').hidden = hay;
+    });
+    document.querySelectorAll('[data-dominio]').forEach(function (li) {
+      var lec = li.dataset.dominio, labs = lista(li), p = dominio(lec, labs);
+      var hechos = labs.filter(function (l) { return prog.labs[l] != null; }).length;
+      li.querySelector('.barra i').style.width = p + '%';
+      li.querySelector('.dom-txt').textContent = 'Dominio ' + p + ' %. Laboratorios hechos: ' + hechos + ' de ' + labs.length + (prog.cuestionarios[lec] != null ? '. Preguntas: ' + Math.round(prog.cuestionarios[lec] * 100) + ' %.' : '.');
+    });
+    document.querySelectorAll('[data-insignia]').forEach(function (el) {
+      var ids = el.dataset.insignia.split(','), labs = lista(el);
+      var v = ids.map(function (i) { return prog.cuestionarios[i] || 0; }).concat(labs.map(function (l) { return prog.labs[l] || 0; }));
+      var p = Math.round(100 * v.reduce(function (a, b) { return a + b; }, 0) / (v.length || 1));
+      var t = el.querySelector('[data-ins-dom]'); if (t) t.textContent = 'Dominio del módulo: ' + p + ' %.';
+      var mz = el.querySelector('[data-maestria]'); if (mz) mz.hidden = p < 80;
+    });
+    var mp = document.getElementById('mejor-prompt');
+    if (mp && prog.labs['laboratorio-evaluador'] != null) { mp.hidden = false; mp.textContent = 'Tu mejor prompt en el Laboratorio de prompts: ' + Math.round(prog.labs['laboratorio-evaluador'] * 100) + ' de 100.'; }
+  }
 
   /* Marcar lección terminada */
   document.querySelectorAll('[data-terminar]').forEach(function (b) {
@@ -157,6 +211,7 @@
     });
     var vacio = document.getElementById('sin-progreso');
     if (vacio) vacio.hidden = Object.keys(prog.lecciones).length > 0;
+    pintarDominio();
   }
 
   /* Código para seguir en otro dispositivo */
@@ -176,6 +231,9 @@
       if (!d.lecciones) throw 0;
       Object.keys(d.lecciones).forEach(function (k) { prog.lecciones[k] = d.lecciones[k]; });
       Object.keys(d.cuestionarios || {}).forEach(function (k) { prog.cuestionarios[k] = Math.max(prog.cuestionarios[k] || 0, d.cuestionarios[k]); });
+      Object.keys(d.labs || {}).forEach(function (k) { prog.labs[k] = Math.max(prog.labs[k] || 0, d.labs[k]); });
+      ['meta', 'leitner', 'estado'].forEach(function (g) { Object.keys(d[g] || {}).forEach(function (k) { prog[g][k] = d[g][k]; }); });
+      if (d.leitnerSesion > (prog.leitnerSesion || 0)) prog.leitnerSesion = d.leitnerSesion;
       guardarProg(); msg.textContent = 'Listo: tu progreso se ha cargado.';
     } catch (e) { msg.textContent = 'Ese código no es válido. Cópialo entero y vuelve a probar.'; }
   });

@@ -20,6 +20,8 @@ from leccion_2_1 import LECCION as L21  # noqa: E402
 from leccion_2_2 import LECCION as L22  # noqa: E402
 from leccion_2_3 import LECCION as L23  # noqa: E402
 from leccion_2_4 import LECCION as L24  # noqa: E402
+from repaso import REPASO, CALENTAMIENTO  # noqa: E402
+from reglas_prompts import REGLAS    # noqa: E402
 
 LECCIONES = {L['id']: L for L in (L11, L12, L13, L21, L22, L23, L24)}
 DOM = 'https://academiamable.es'
@@ -56,7 +58,8 @@ def huella(txt):
 
 CSS = leer('estilos.css')
 JS = leer('app.js')
-V_CSS, V_JS = huella(CSS), huella(JS)
+LABJS = leer('labs.js')
+V_CSS, V_JS, V_LAB = huella(CSS), huella(JS), huella(LABJS)
 
 # ---------- Ilustraciones y fotos ----------
 def ilu(nombre, w, h, clase='', lazy=True, alt=''):
@@ -128,16 +131,19 @@ def foto_o_ilu(clave, ilu_html, clase='', hero=False, alt=None):
     if not wh:
         return ilu_html
     carga = 'fetchpriority="high"' if hero else 'loading="lazy"'
-    return (f'<img class="{clase} foto" src="{url}" width="{wh[0]}" height="{wh[1]}" '
+    peq = os.path.join(RAIZ, 'img', 'fotos', clave + '-600.webp')
+    srcset = (f'srcset="/img/fotos/{clave}-600.webp 600w, {url} {wh[0]}w" sizes="(max-width: 700px) 92vw, 600px" '
+              if os.path.exists(peq) else '')
+    return (f'<img class="{clase} foto" src="{url}" {srcset}width="{wh[0]}" height="{wh[1]}" '
             f'alt="{e(alt if alt is not None else FOTOS.get(clave, ""))}" {carga} decoding="async">')
 
 
 MOD_ICO = {n: f'modulo-{n}' for n in range(1, 7)}
 
 
-def marco_modulo(n, clase='marco'):
+def marco_modulo(n, clase='marco', hero=False):
     """Marco 4:3 del módulo: su foto si existe; si no, el emblema sobre el color del módulo."""
-    f = foto_o_ilu(f'modulo-{n}', '', 'marco-foto')
+    f = foto_o_ilu(f'modulo-{n}', '', 'marco-foto', hero=hero)
     if f:
         return f'<div class="{clase} con-foto">{f}</div>'
     return f'<div class="{clase}" aria-hidden="true">{ilu(MOD_ICO[n], 160, 160, "marco-emb")}</div>'
@@ -151,7 +157,7 @@ ICO_ATM = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="curr
 ICO_OIR = ('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">'
            '<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>')
 
-NAV = [('/cursos/', 'Cursos'), ('/talleres/', 'Talleres'), ('/entidades/', 'Para entidades'), ('/mi-aprendizaje/', 'Mi aprendizaje')]
+NAV = [('/cursos/', 'Cursos'), ('/laboratorio/', 'Laboratorio'), ('/talleres/', 'Talleres'), ('/entidades/', 'Para entidades'), ('/mi-aprendizaje/', 'Mi aprendizaje')]
 
 PREFS_INLINE = ("<script>try{var p=JSON.parse(localStorage.getItem('aa-prefs')||'{}'),m={facil:'is-facil',oir:'is-oir',grande:'is-grande',"
                 "contraste:'is-contraste',pasos:'is-pasos',pictos:'is-pictos'};for(var k in m)if(p[k])document.documentElement.classList.add(m[k])}catch(e){}</script>")
@@ -183,7 +189,7 @@ def cabecera(activo):
 PIE = f'''<footer class="pie-web"><div class="c">
 <div class="rej">
 <div><a class="marca" href="/" style="color:#fff">{LOGO}{WM.replace('<b>', '<b style="color:#7FD3D4">')}</a><p style="margin-top:12px">Aprender, a tu manera. Una iniciativa de la entidad social Euexia Rural, con <a href="https://esamable.es">IA-Mable</a>.</p></div>
-<div><h2>Aprende</h2><ul><li><a href="/cursos/iniciacion-ia/">Curso gratis de IA</a></li><li><a href="/cursos/">Todos los cursos</a></li><li><a href="/talleres/">Talleres</a></li><li><a href="/mi-aprendizaje/">Mi aprendizaje</a></li></ul></div>
+<div><h2>Aprende</h2><ul><li><a href="/cursos/iniciacion-ia/">Curso gratis de IA</a></li><li><a href="/cursos/">Todos los cursos</a></li><li><a href="/laboratorio/">Laboratorio de prompts</a></li><li><a href="/metodo/">Cómo aprendes aquí</a></li><li><a href="/talleres/">Talleres</a></li><li><a href="/mi-aprendizaje/">Mi aprendizaje</a></li></ul></div>
 <div><h2>Contacto</h2><ul><li><a href="https://wa.me/{WA}">WhatsApp {WA_TXT}</a></li><li><a href="/entidades/">Formación para entidades y empresas</a></li><li><a href="https://euexiarural.com">Euexia Rural</a></li></ul></div>
 </div>
 <p class="leg">{'Imágenes creadas con IA. ' if HAY_FOTOS else ''}© {datetime.date.today().year} {ENTIDAD['nombre']} · CIF {ENTIDAD['cif']} · <a href="/aviso-legal/">Aviso legal</a> · <a href="/privacidad/">Privacidad</a> · <a href="/cookies/">Cookies</a></p>
@@ -201,7 +207,7 @@ def B(normal, facil, tag='div', clase=''):
             f'<div class="n">{glos(normal)}</div><div class="f">{facil}</div></{tag}>')
 
 
-def pagina(ruta, titulo, desc, cuerpo, activo='', schema=None, noindex=False, prioridad='0.6'):
+def pagina(ruta, titulo, desc, cuerpo, activo='', schema=None, noindex=False, prioridad='0.6', precarga=None):
     canon = DOM + '/' + (ruta + '/' if ruta else '')
     sch = ''
     for s in (schema or []):
@@ -224,6 +230,7 @@ def pagina(ruta, titulo, desc, cuerpo, activo='', schema=None, noindex=False, pr
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="preload" href="/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
+{f'<link rel="preload" href="{precarga}" as="image" fetchpriority="high">' if precarga else ''}
 <link rel="stylesheet" href="/estilos.css?v={V_CSS}">
 {PREFS_INLINE}
 {sch}
@@ -236,6 +243,7 @@ def pagina(ruta, titulo, desc, cuerpo, activo='', schema=None, noindex=False, pr
 {PIE}
 {PANEL}
 <script src="/app.js?v={V_JS}" defer></script>
+{scripts_lab(cuerpo)}
 </body>
 </html>
 '''
@@ -244,6 +252,73 @@ def pagina(ruta, titulo, desc, cuerpo, activo='', schema=None, noindex=False, pr
     if not noindex:
         PAGINAS.append((ruta, prioridad))
         LLMS.append((titulo, canon, desc))
+
+
+def scripts_lab(cuerpo):
+    """labs.js solo en las páginas con laboratorios; las reglas del evaluador, solo si hacen falta."""
+    if 'class="lab-app' not in cuerpo:
+        return ''
+    reglas = ''
+    if 'data-lab="evaluador-prompts"' in cuerpo or 'data-lab="constructor-prompts"' in cuerpo:
+        reglas = '<script type="application/json" id="aa-reglas">' + jsonh(REGLAS) + '</script>'
+    return f'{reglas}<script src="/labs.js?v={V_LAB}" defer></script>'
+
+
+def jsonh(o):
+    """JSON seguro dentro de <script>."""
+    return json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+
+
+# ---------- Laboratorios (Método AcademiAmable: aprender tocando) ----------
+LAB_TIPO = {'clasifica': 'Clasifica', 'verdad-o-mito': 'Verdad o mito', 'siguiente-palabra': 'La siguiente palabra',
+            'ensena-a-la-maquina': 'Enseña a la máquina', 'evaluador-prompts': 'Evaluador de prompts',
+            'constructor-prompts': 'Constructor de prompts', 'elige-la-mejor': 'Elige la mejor', 'detective': 'Detective de la IA',
+            'repaso': 'Repaso relámpago', 'explicaselo': 'Explícaselo a…'}
+ICO_LAB = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+           '<path d="M9.5 3.5h5M10 3.5v6L4.8 18.3A1.5 1.5 0 0 0 6.1 20.5h11.8a1.5 1.5 0 0 0 1.3-2.2L14 9.5v-6"/><path d="M7.5 14.5h9"/></svg>')
+ICO_RAYO = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg>')
+ICO_HABLA = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v11H10l-5 4v-4H4z"/><path d="M8 10h8M8 13h5"/></svg>')
+SIN_JS = '<p class="lab-sin">Este laboratorio es interactivo: necesita que el navegador tenga JavaScript activado. Si no se carga, haz la tarea en papel con la explicación de arriba.</p>'
+
+
+def lab(cfg, lec=None, nivel=3, mod=4):
+    """Contenedor de un laboratorio: cabecera, instrucciones (normal y Fácil, con Escuchar) y su configuración en JSON."""
+    cid, tipo = cfg['id'], cfg['tipo']
+    datos = {k: v for k, v in cfg.items() if k not in ('intro', 'intro_f', 'titulo')}
+    datos['nivel'] = nivel
+    clase = {'repaso': ' rapido', 'explicaselo': ' comparte'}.get(tipo, '')
+    ico = {'repaso': ICO_RAYO, 'explicaselo': ICO_HABLA}.get(tipo, ICO_LAB)
+    etq = {'repaso': 'Para empezar', 'explicaselo': 'Explícalo con tus palabras'}.get(tipo, 'Laboratorio')
+    intro = B(cfg['intro'], cfg.get('intro_f', cfg['intro'])) if cfg.get('intro') else ''
+    dlec = f' data-lec="{lec}"' if lec else ''
+    return (f'<section class="lab m{mod}{clase}" id="lab-{cid}" aria-labelledby="lab-{cid}-t">'
+            f'<div class="lab-cab"><span class="lab-etq">{ico}{etq}</span><h{nivel} id="lab-{cid}-t">{e(cfg["titulo"])}</h{nivel}></div>'
+            f'<div class="lab-cuerpo">{intro}<div class="lab-app" id="app-{cid}" data-lab="{tipo}"{dlec}>{SIN_JS}</div>'
+            f'<script type="application/json" id="app-{cid}-cfg">{jsonh(datos)}</script></div></section>')
+
+
+def labs_de(Lc):
+    """Laboratorios de una lección que cuentan para el dominio (todos menos el repaso)."""
+    return [bl[1] for _, bloques in Lc['pasos'] for bl in bloques if bl[0] == 'lab' and bl[1]['tipo'] != 'repaso']
+
+
+def repaso_de(Lc):
+    """Repaso relámpago automático al empezar: preguntas de las lecciones publicadas anteriores."""
+    previas = [l for l in TODAS[:[x[0] for x in TODAS].index(Lc['id'])] if l[2]]
+    pool = []
+    for lid, tit, _, _ in previas:
+        for q in REPASO.get(lid, []):
+            pool.append(dict(q, lec=lid, lect=tit))
+    cfg = {'tipo': 'repaso', 'id': f'{Lc["id"]}-repaso', 'titulo': 'Repaso relámpago', 'pool': pool}
+    if pool:
+        cfg['intro'] = '<p>Tres preguntas rápidas de lo que ya viste. Intentar recordar, aunque cueste, es lo que hace que no se olvide. Lo que falles volverá antes.</p>'
+        cfg['intro_f'] = '<p>Tres preguntas de las lecciones de antes. Así no se te olvida.</p>'
+    else:
+        cfg['calentamiento'] = CALENTAMIENTO
+    return lab(cfg, Lc['id'], mod=Lc['modulo'])
+
+
+CONF_OPS = [('seguro', 'Lo sé'), ('creo', 'Creo que sí'), ('ni', 'Ni idea')]
 
 
 ORG = {'@context': 'https://schema.org', '@type': 'EducationalOrganization', 'name': 'AcademiAmable', 'url': DOM + '/',
@@ -330,9 +405,18 @@ def portada():
 <section class="sec"><div class="c">
 <span class="etq">Cómo se aprende</span>
 <h2>Primero lo pruebas, luego lo entiendes</h2>
-{B('<p>Cada lección dura de 20 a 30 minutos y parte de una situación real. Lo que aprendes lo conectas con tu trabajo, tu casa y tu comunidad.</p>',
-   '<p>Cada lección dura media hora o menos. Empieza con un caso de la vida real.</p>')}
+{B('<p>Cada lección dura de 20 a 30 minutos y parte de una situación real. Empieza con un repaso relámpago, tiene laboratorios para tocar y probar, y termina contigo explicándoselo a alguien. Lo que aprendes lo conectas con tu trabajo, tu casa y tu comunidad.</p>',
+   '<p>Cada lección dura media hora o menos. Empieza con un caso de la vida real. Tiene juegos para probar.</p>')}
 <ol class="ciclo">{ciclo_html}</ol>
+<div class="acc"><a class="btn lin" href="/metodo/">Así aprendes aquí: el Método AcademiAmable</a></div>
+<aside class="promo-lab" aria-labelledby="promo-lab-t">
+<div class="promo-lab-txt"><span class="etq">Herramienta gratis</span><h3 id="promo-lab-t">¿Le pides bien las cosas a la IA?</h3>
+{B('<p>Escribe lo que le pedirías a ChatGPT, Gemini o Claude y el evaluador de prompts te dice, al momento, qué le falta y cómo mejorarlo. Gratis, en español y sin registrarte.</p>',
+   '<p>Escribe lo que le pides a la IA. Te decimos cómo pedirlo mejor. Es gratis.</p>')}
+<a class="btn" href="/laboratorio/">Probar el evaluador de prompts</a></div>
+<div class="promo-lab-arte" aria-hidden="true"><div class="pl-anillo"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#E3E3DE" stroke-width="12"/><circle cx="60" cy="60" r="52" fill="none" stroke="#0B7A7C" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="42.5" transform="rotate(-90 60 60)"/></svg><b>87</b></div>
+<ul class="pl-ings"><li class="on">Quién eres</li><li class="on">Qué quieres</li><li class="on">Para qué</li><li class="on">Formato</li><li class="on">Tono</li><li>Límites</li></ul></div>
+</aside>
 </div></section>
 
 <section class="sec banda amarilla"><div class="c">
@@ -437,17 +521,25 @@ def leccion(Lc):
     m = next(x for x in C['modulos'] if x['n'] == Lc['modulo'])
     pasos_html = ''
     for i, (nombre, bloques) in enumerate(Lc['pasos'], 1):
-        contenido = ''
+        contenido = repaso_de(Lc) if i == 1 else ''
         for bl in bloques:
             tipo = bl[0]
-            if tipo == 'quiz':
+            if tipo == 'lab':
+                contenido += lab(bl[1], Lc['id'], mod=Lc['modulo'])
+            elif tipo == 'quiz':
                 fs = ''
-                for qi, (preg, opciones, expl) in enumerate(bl[1]):
+                for qi, q in enumerate(bl[1]):
+                    preg, opciones, expl = q[0], q[1], q[2]
+                    expl_f = q[3] if len(q) > 3 else expl
                     ops = ''
                     for oi, (txt, ok, extra) in enumerate(opciones):
                         ops += (f'<label{" data-x" if extra else ""}><input type="radio" name="q{qi}" value="{oi}"{" data-ok" if ok else ""}>'
                                 f'<span>{e(txt)}</span></label>')
-                    fs += f'<fieldset><legend>{qi + 1}. {e(preg)}</legend>{ops}<p class="expl" hidden>{e(expl)}</p></fieldset>'
+                    conf = ('<fieldset class="conf"><legend>¿Cómo de seguro estás? (si quieres)</legend>'
+                            + ''.join(f'<label class="conf-op"><input type="radio" name="q{qi}c" value="{v}"><span>{t}</span></label>' for v, t in CONF_OPS)
+                            + '</fieldset>')
+                    fs += (f'<fieldset class="q" data-q="{qi}"><legend>{qi + 1}. {e(preg)}</legend>{ops}{conf}'
+                           f'<div class="expl" hidden><p class="n-only">{e(expl)}</p><p class="f-only">{e(expl_f)}</p></div></fieldset>')
                 contenido += (f'<form class="quiz" data-id="{Lc["id"]}"><p class="f-only" style="color:var(--m)">En lectura fácil verás solo 2 respuestas en cada pregunta.</p>{fs}'
                               f'<button class="btn" type="submit">Comprobar respuestas</button><p class="res" role="status" aria-live="polite"></p></form>')
             else:
@@ -464,6 +556,21 @@ def leccion(Lc):
     navp = ('<div class="nav-pasos"><button class="btn lin peq" type="button" data-paso="-1">Anterior</button>'
             '<span data-paso-txt aria-live="polite" style="align-self:center"></span>'
             '<button class="btn peq" type="button" data-paso="1">Siguiente</button></div>')
+    labs_l = labs_de(Lc)
+    res_labs = ''.join(f'<li data-res-lab="{c["id"]}"><span class="est" role="img" aria-label="Sin hacer"></span><a href="#lab-{c["id"]}">{e(c["titulo"])}</a> <span class="res-nota"></span></li>' for c in labs_l)
+    resumen_html = f'''<section class="resumen" data-resumen="{Lc['id']}" data-labs="{','.join(c['id'] for c in labs_l)}" aria-labelledby="res-t">
+<h2 id="res-t">Tu resumen de la lección</h2>
+<div class="res-dom"><p class="res-pc"><span>Dominio</span> <b data-dom-pc>0 %</b></p><div class="barra" role="presentation"><i></i></div>
+<p class="res-ayuda n-only">Sale de tus laboratorios y de las preguntas de «Piensa». No bloquea nada: es tu brújula.</p><p class="res-ayuda f-only">Sale de lo que has hecho en la lección.</p></div>
+<h3>Laboratorios</h3><ul class="res-labs">{res_labs}<li data-res-lab="quiz"><span class="est" role="img" aria-label="Sin hacer"></span><a href="#paso-{len(Lc['pasos'])}">Preguntas de «Piensa»</a> <span class="res-nota"></span></li></ul>
+<h3>¿Lo sabías o dudabas?</h3>
+<div class="metacog" data-metacog>
+<div class="mc mc-a"><h4>Acertaste y estabas seguro</h4><ul></ul></div>
+<div class="mc mc-b"><h4>Acertaste dudando</h4><ul></ul></div>
+<div class="mc mc-c"><h4>Repasa esto</h4><ul></ul></div>
+</div>
+<p class="mc-vacio" data-mc-vacio>Cuando contestes, marca «Lo sé», «Creo que sí» o «Ni idea». Aquí verás qué tienes firme y qué conviene repasar.</p>
+</section>'''
     borrador = '' if Lc['validada'] else '<p class="aviso" style="margin-top:14px"><b>Lección en prueba.</b> La versión Fácil está pendiente de validar con personas.</p>'
     cuerpo = f'''
 <div class="lec-cab m{m['n']}"><div class="c lec-cab-rej">
@@ -474,13 +581,14 @@ def leccion(Lc):
 <ol class="mini-ciclo" aria-hidden="true">{''.join(f'<li>{ilu("ico-" + PASO_ICO[n], 96, 96)}</li>' for n, _ in Lc['pasos'] if n in PASO_ICO)}</ol>
 {borrador}
 </div>
-{marco_modulo(m['n'], 'lec-marco')}
+{marco_modulo(m['n'], 'lec-marco', hero=True)}
 </div></div>
 <div class="c estrecho">
 {navp}
 <ol class="pasos">{pasos_html}</ol>
 {navp}
 <div class="fin-lec">
+{resumen_html}
 <p class="conecta"><b>Esto conecta con…</b> {conecta}.</p>
 <button class="btn" type="button" data-terminar="{Lc['id']}">He terminado esta lección</button>
 <p id="msg-fin" role="status" aria-live="polite" style="margin:10px 0 0;font-weight:700"></p>
@@ -491,7 +599,117 @@ def leccion(Lc):
            'description': Lc['descripcion'], 'inLanguage': 'es', 'isAccessibleForFree': True, 'learningResourceType': 'Lesson',
            'timeRequired': f'PT{Lc["minutos"]}M', 'isPartOf': {'@type': 'Course', 'name': C['titulo'], 'url': DOM + CURL}}
     pagina(url_lec(Lc['id']).strip('/'), f'{Lc["titulo"]}: explicado fácil | Curso de IA gratis', Lc['descripcion'],
-           cuerpo, activo='/cursos/', schema=[sch], prioridad='0.7')
+           cuerpo, activo='/cursos/', schema=[sch], prioridad='0.7', precarga=ruta_foto(f'modulo-{m["n"]}')[1])
+
+
+# ---------- Laboratorio de prompts (página pública) ----------
+def laboratorio():
+    from reglas_prompts import GALERIA, CONSTRUCTOR
+    ev = {'tipo': 'evaluador-prompts', 'id': 'laboratorio-evaluador', 'titulo': 'Evaluador de prompts', 'galeria': GALERIA,
+          'inicial': 'Escribe un mensaje para mis clientes.',
+          'intro': '<p>Escribe lo que le pedirías a una IA. Mientras escribes, se encienden los seis ingredientes de un buen <i>prompt</i> y la nota sube. Si falta algo, te proponemos una frase para añadirla con un toque.</p>',
+          'intro_f': '<p>Escribe lo que le pides a la IA. Hay 6 piezas. Se encienden cuando las pones.</p>'}
+    co = {'tipo': 'constructor-prompts', 'id': 'laboratorio-constructor', 'titulo': 'Constructor de prompts', 'pasos': CONSTRUCTOR,
+          'intro': '<p>¿Te cuesta empezar? Elige una opción en cada paso y el prompt se monta solo. Cuando lo tengas, cópialo o llévalo al evaluador para afinarlo.</p>',
+          'intro_f': '<p>Elige una opción en cada paso. El mensaje se escribe solo.</p>'}
+    filas = ''.join(f'<li><b>{e(g["n"])}</b> <span class="pill">{g["w"]} puntos</span><br>{e(g["d"])}</li>' for g in REGLAS['ing'])
+    cuerpo = f'''
+<div class="pag-cab lab-pag"><div class="c"><p class="migas"><a href="/">Inicio</a> › Laboratorio de prompts</p>
+<h1>Laboratorio de prompts</h1>
+{B('<p class="ent">Un <i>prompt</i> es lo que le escribes a una IA. Aquí aprendes a escribirlo bien, tocando: el evaluador te dice al momento qué le falta, en español y con casos de pueblo. Es gratis, sin registro, y lo que escribes no sale de tu móvil.</p>',
+   '<p class="ent">Un prompt es lo que le escribes a la IA. Aquí aprendes a escribirlo bien. Es gratis.</p>')}
+</div></div>
+<div class="c lab-pag-c">
+<div id="evaluador">{lab(ev, nivel=2)}</div>
+<div id="constructor">{lab(co, nivel=2)}</div>
+<section class="como-puntua" aria-labelledby="puntua-t">
+<h2 id="puntua-t">Cómo puntúa el evaluador</h2>
+{B('<p>No hay magia ni otra IA detrás: el evaluador busca en tu texto palabras y expresiones típicas de cada ingrediente. Suma los puntos de los que encuentra, hasta 100. Si no dices qué quieres que haga, como mucho llega a 40; con menos de 6 palabras, a 25. Si ve un DNI, un teléfono, una cuenta o una clave, te avisa para que los quites.</p><p>Es una ayuda para practicar, no un examen: un prompt corto puede funcionar bien, y uno de 100 puntos puede necesitar que corrijas la respuesta. Lo importante es la costumbre de dar contexto.</p>',
+   '<p>El evaluador busca 6 piezas en tu texto. Cada pieza da puntos. Si pones tu DNI o tu teléfono, te avisa.</p>')}
+<ul class="lista-puntos">{filas}</ul>
+<p>¿Quieres aprenderlo paso a paso? Empieza el <a href="{CURL}">curso gratis «IA sin miedo»</a> o mira <a href="/metodo/">cómo aprendes aquí</a>.</p>
+</section>
+</div>'''
+    sch = {'@context': 'https://schema.org', '@type': 'WebApplication', 'name': 'Evaluador de prompts en español', 'url': DOM + '/laboratorio/',
+           'applicationCategory': 'EducationalApplication', 'operatingSystem': 'Cualquiera (navegador web)', 'inLanguage': 'es', 'isAccessibleForFree': True,
+           'description': 'Evaluador y constructor de prompts gratis en español: escribe lo que le pedirías a una IA y descubre qué le falta para que te conteste mejor.',
+           'offers': {'@type': 'Offer', 'price': 0, 'priceCurrency': 'EUR'},
+           'provider': {'@type': 'EducationalOrganization', 'name': 'AcademiAmable', 'url': DOM + '/'},
+           'accessibilityFeature': ['simplifiedLanguage', 'highContrastDisplay', 'largePrint', 'ttsMarkup']}
+    pagina('laboratorio', 'Evaluador de prompts gratis en español | AcademiAmable',
+           'Evaluador y constructor de prompts gratis en español: escribe lo que le pedirías a ChatGPT, Gemini o Claude y mira al momento qué le falta. Con versión Fácil.',
+           cuerpo, activo='/laboratorio/', schema=[sch], prioridad='0.8')
+
+
+# ---------- Cómo aprendes aquí: el Método AcademiAmable ----------
+PRINCIPIOS = [
+    ('Tocar antes que leer', 'prueba',
+     '<p>Cada lección tiene al menos un laboratorio: algo que tocas, mueves o pruebas antes de que te lo expliquemos del todo. Primero lo vives; luego la explicación encaja.</p>',
+     '<p>Primero pruebas. Después lees la explicación.</p>',
+     'Maria Montessori, que a principios del siglo XX diseñó materiales para aprender con las manos, y John Dewey, que defendió aprender haciendo (<i>Democracia y educación</i>, 1916).',
+     f'{CURL}como-aprende/#lab-como-aprende-maquina', 'Enseña a una máquina a detectar estafas'),
+    ('Primero un ejemplo resuelto, luego tú', 'descubre',
+     '<p>Los laboratorios empiezan con un caso ya hecho y explicado. Después lo haces tú con ayuda, y al final hay un reto libre con un caso tuyo. La ayuda se va retirando poco a poco.</p>',
+     '<p>Primero ves un ejemplo hecho. Después lo haces tú.</p>',
+     'El efecto del ejemplo resuelto, que estudió John Sweller dentro de su teoría de la carga cognitiva (años 80), y la retirada gradual de la ayuda que investigaron Alexander Renkl y Robert Atkinson.',
+     f'{CURL}ia-que-reconoce/#lab-ia-que-reconoce-tipos', 'Clasifica 10 herramientas de IA'),
+    ('Recordar en vez de releer', 'piensa',
+     '<p>Cada lección empieza con un repaso relámpago: tres preguntas de lo que ya viste. Lo que fallas vuelve antes y lo que aciertas tarda más en volver, como en una caja de fichas.</p>',
+     '<p>Al empezar, contestas 3 preguntas de antes. Así no se te olvida.</p>',
+     'La práctica de recuperación (Henry Roediger y Jeffrey Karpicke, 2006), la curva del olvido y el repaso espaciado de Hermann Ebbinghaus (1885) y la caja de fichas de Sebastian Leitner (1972).',
+     f'{CURL}como-aprende/#lab-como-aprende-repaso', 'Haz un repaso relámpago'),
+    ('El error enseña', 'situacion',
+     '<p>Cada respuesta te dice por qué, al momento, en normal y en Fácil. Equivocarse no resta ni castiga: es justo cuando más se aprende, si sabes por qué.</p>',
+     '<p>Si te equivocas, te explicamos por qué. No pasa nada.</p>',
+     'Los trabajos de John Hattie sobre lo que más influye en el aprendizaje y su estudio con Helen Timperley sobre la retroalimentación (2007): ayuda saber qué ha pasado y cómo mejorar, más que la nota.',
+     f'{CURL}que-es-y-que-no-es/#lab-que-es-y-que-no-es-mitos', 'Juega a «Verdad o mito»'),
+    ('Dominar antes de avanzar, sin bloquear', 'ritmo',
+     '<p>Tus laboratorios y respuestas forman un medidor de dominio en cada lección y las insignias de cada módulo. Te dice qué tienes firme y qué conviene repasar. Nada se cierra: tú decides cuándo seguir.</p>',
+     '<p>Ves cuánto sabes de cada lección. Puedes seguir cuando quieras.</p>',
+     'El aprendizaje para el dominio de Benjamin Bloom (1968): con tiempo, ayuda y nuevas oportunidades, casi todo el mundo puede llegar a dominar lo que estudia. En 1984 lo comparó con las clases de siempre y con la tutoría individual, en su artículo sobre el «problema de las dos sigmas».',
+     '/mi-aprendizaje/', 'Mira tu dominio en «Mi aprendizaje»'),
+    ('Explícalo con tus palabras', 'comparte',
+     '<p>En el paso «Comparte» rellenas una plantilla para explicárselo a tu madre, a un cliente o a un niño de 10 años, y lo puedes mandar por WhatsApp. Si te atascas en un hueco, ahí está lo que te falta.</p>',
+     '<p>Le explicas lo que has aprendido a otra persona. Lo puedes mandar por WhatsApp.</p>',
+     'Lo que hoy se conoce como «técnica Feynman», por el físico Richard Feynman, famoso por explicar lo difícil con palabras sencillas, y el llamado efecto de aprender enseñando.',
+     f'{CURL}que-es-y-que-no-es/#lab-que-es-y-que-no-es-explica', 'Explícaselo a alguien'),
+    ('Accesible por diseño', 'facil',
+     '<p>Todo se puede usar con el teclado, con el dedo o con un lector de pantalla, sin arrastrar si no quieres. Cada laboratorio tiene versión Fácil y se puede escuchar. Sin tiempos ni prisas.</p>',
+     '<p>Todo tiene lectura fácil. Lo puedes escuchar. Sin prisas.</p>',
+     'El Diseño Universal para el Aprendizaje de CAST (desde los años 90), que propone varias formas de ver, de hacer y de implicarse, y las pautas de Lectura Fácil (en España, la norma UNE 153101 EX, de 2018).',
+     '/laboratorio/', 'Prueba el Laboratorio de prompts'),
+]
+
+
+def metodo():
+    items = ''
+    for t, icono, n, f, base, url, enlace in PRINCIPIOS:
+        items += (f'<li class="pr">{ilu("ico-" + icono, 96, 96, "pr-ico")}<div class="pr-txt"><h2>{e(t)}</h2>{B(n, f)}'
+                  f'<p class="pr-base"><b>En qué se basa:</b> {base}</p><p class="pr-ir"><a href="{url}">{e(enlace)}</a></p></div></li>')
+    cuerpo = f'''
+<div class="pag-cab"><div class="c estrecho"><p class="migas"><a href="/">Inicio</a> › Cómo aprendes aquí</p>
+<h1>Cómo aprendes aquí: el Método AcademiAmable</h1>
+{B('<p class="ent">Lo llamamos «aprender tocando». Son siete ideas sencillas, sacadas de lo que la investigación sobre el aprendizaje lleva décadas comprobando, al servicio de una cosa: que lo que aprendas aquí lo puedas usar mañana en tu trabajo, en tu casa o en tu pueblo.</p>',
+   '<p class="ent">Aquí aprendes tocando y probando. Son 7 ideas. Las explicamos abajo.</p>')}
+</div></div>
+<div class="c estrecho">
+<ul class="principios">{items}</ul>
+<section class="pr-extra" aria-labelledby="meta-t">
+<h2 id="meta-t">¿Lo sabías o dudabas?</h2>
+{B('<p>En las preguntas y en algunos laboratorios puedes marcar cómo de seguro estás: «Lo sé», «Creo que sí» o «Ni idea». Al final de la lección te enseñamos qué acertaste con seguridad, qué acertaste dudando y qué conviene repasar. Saber lo que sabes también se aprende: se llama metacognición, una idea que estudió John Flavell en los años 70.</p>',
+   '<p>Puedes decir si estás seguro de tu respuesta. Al final ves qué sabes bien y qué tienes que repasar.</p>')}
+<p><a href="{CURL}ia-que-conversa/#lab-ia-que-conversa-elige">Pruébalo eligiendo la mejor respuesta de una IA</a></p>
+<h2>Lo que no hacemos</h2>
+<ul class="lista-ok"><li>No ponemos tiempos ni cuentas atrás: vas a tu ritmo.</li><li>No cerramos lecciones: puedes ir a la que quieras.</li><li>No hay clasificaciones ni comparaciones con otras personas.</li><li>No guardamos tus respuestas en ningún servidor: se quedan en tu móvil u ordenador.</li></ul>
+<div class="acc"><a class="btn" href="{CURL}">Empezar el curso gratis</a><button class="btn lin" type="button" data-abre-panel aria-haspopup="dialog">{ICO_ATM}Aprender a tu manera</button></div>
+</section>
+</div>'''
+    sch = {'@context': 'https://schema.org', '@type': 'WebPage', 'name': 'Cómo aprendes aquí: el Método AcademiAmable', 'url': DOM + '/metodo/', 'inLanguage': 'es',
+           'about': 'Método de aprendizaje práctico y accesible basado en la investigación educativa',
+           'publisher': {'@type': 'EducationalOrganization', 'name': 'AcademiAmable', 'url': DOM + '/'}}
+    pagina('metodo', 'Cómo aprendes aquí: el Método AcademiAmable | AcademiAmable',
+           'Aprender tocando: laboratorios, repaso relámpago, errores que enseñan y explicarlo con tus palabras. Las 7 ideas del método de AcademiAmable y en qué investigación se basan.',
+           cuerpo, schema=[sch], prioridad='0.6')
 
 
 # ---------- Mapa del curso ----------
@@ -557,9 +775,16 @@ def mapa():
 # ---------- Mi aprendizaje ----------
 def mi_aprendizaje():
     insignias = ''.join(
-        f'<div class="tar insignia m{m["n"]}" data-insignia="{",".join(l[0] for l in m["lecciones"])}" hidden>{ilu(MOD_ICO[m["n"]], 160, 160, "ins-emb")}<span><span class="pill gratis">Insignia</span></span><h3>Módulo {m["n"]}: {e(m["titulo"])}</h3><p>Has terminado todas sus lecciones.</p></div>'
+        f'<div class="tar insignia m{m["n"]}" data-insignia="{",".join(l[0] for l in m["lecciones"])}" data-labs="{",".join(c["id"] for l in m["lecciones"] if l[0] in LECCIONES for c in labs_de(LECCIONES[l[0]]))}" hidden>{ilu(MOD_ICO[m["n"]], 160, 160, "ins-emb")}<span><span class="pill gratis">Insignia</span> <span class="pill pronto" data-maestria hidden>Con maestría</span></span><h3>Módulo {m["n"]}: {e(m["titulo"])}</h3><p>Has terminado todas sus lecciones.</p><p class="ins-dom" data-ins-dom></p></div>'
         for m in C['modulos'])
     ids = ','.join(l[0] for l in TODAS)
+    dominios = ''
+    for lid in IDS_PUB:
+        Lc = LECCIONES[lid]
+        labs_l = labs_de(Lc)
+        dominios += (f'<li class="dom m{Lc["modulo"]}" data-dominio="{lid}" data-labs="{",".join(c["id"] for c in labs_l)}">'
+                     f'<a href="{url_lec(lid)}"><span class="dom-num">{Lc["num"]}</span> {e(Lc["titulo"])}</a>'
+                     f'<div class="barra peq" role="presentation"><i></i></div><p class="dom-txt"></p></li>')
     cuerpo = f'''
 <div class="pag-cab"><div class="c estrecho"><h1>Mi aprendizaje</h1>
 {B('<p>Aquí ves lo que llevas hecho. Tu progreso se guarda solo en este móvil u ordenador: no hace falta registrarse y nadie más lo ve.</p>',
@@ -571,6 +796,11 @@ def mi_aprendizaje():
 <p id="txt-mi" class="prog-txt"></p><div class="barra" data-barra="{ids}" data-txt="txt-mi"><i></i></div>
 <p class="prog-acc"><a class="btn peq" href="{CURL}">Seguir con el curso</a></p></section>
 <div id="sin-progreso" class="vacio">{ilu('vacio', 240, 200)}<p>Todavía no has terminado ninguna lección. <a href="{url_lec(IDS_PUB[0])}">Empieza por la primera</a>.</p></div>
+<h2>Tu dominio, lección a lección</h2>
+{B('<p>El dominio sale de tus laboratorios y de las preguntas de cada lección. No bloquea nada: te dice qué tienes firme y qué conviene repasar. Puedes repetir cualquier laboratorio cuando quieras.</p>',
+   '<p>Aquí ves cuánto sabes de cada lección. Puedes repetir los juegos cuando quieras.</p>')}
+<ul class="dominios">{dominios}</ul>
+<p id="mejor-prompt" class="aviso" hidden></p>
 <h2>Insignias</h2><div class="rej">{insignias}</div>
 <h2>Certificado</h2><p>Cuando termines los 6 módulos, aquí podrás descargar tu certificado en PDF con tu nombre y un código para comprobarlo.</p>
 <h2>Seguir en otro dispositivo</h2>
@@ -654,6 +884,7 @@ def error404():
 def tecnicos():
     escribir('estilos.css', re.sub(r'\n\s*', '\n', CSS))
     escribir('app.js', JS)
+    escribir('labs.js', LABJS)
     urls = ''.join(f'<url><loc>{DOM}/{r + "/" if r else ""}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>' for r, p in PAGINAS)
     escribir('sitemap.xml', f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
     escribir('robots.txt', f'User-agent: *\nAllow: /\nDisallow: /mi-aprendizaje/\n\n'
@@ -673,8 +904,8 @@ def tecnicos():
                   {'src': '/img/icono-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'},
                   {'src': '/favicon.svg', 'sizes': 'any', 'type': 'image/svg+xml'}]}, ensure_ascii=False, indent=1))
     escribir('sw.js', f'''// AcademiAmable · funciona sin conexión con las páginas ya abiertas.
-const V = 'aa-{huella(CSS + JS + HOY)}';
-const BASE = ['/', '/estilos.css?v={V_CSS}', '/app.js?v={V_JS}', '/img/logo.svg', '/fonts/montserrat-latin.woff2', '/fonts/nunito-latin.woff2', '/mi-aprendizaje/'];
+const V = 'aa-{huella(CSS + JS + LABJS + HOY)}';
+const BASE = ['/', '/estilos.css?v={V_CSS}', '/app.js?v={V_JS}', '/labs.js?v={V_LAB}', '/img/logo.svg', '/fonts/montserrat-latin.woff2', '/fonts/nunito-latin.woff2', '/mi-aprendizaje/'];
 self.addEventListener('install', e => {{ e.waitUntil(caches.open(V).then(c => c.addAll(BASE)).then(() => self.skipWaiting())); }});
 self.addEventListener('activate', e => {{ e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); }});
 self.addEventListener('fetch', e => {{
@@ -695,5 +926,6 @@ if __name__ == '__main__':
     portada(); catalogo(); ficha()
     for Lc in LECCIONES.values():
         leccion(Lc)
+    laboratorio(); metodo()
     mapa(); mi_aprendizaje(); talleres(); entidades(); legal(); error404(); tecnicos()
     print(f'{len(PAGINAS)} páginas indexables generadas.')

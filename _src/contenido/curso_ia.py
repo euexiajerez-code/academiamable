@@ -25,7 +25,7 @@ CURSO = {
              ('como-aprende', 'Cómo «aprende» una IA', True),
              ('ia-que-ya-usas', 'La IA que ya usas sin saberlo', True)]},
         {'n': 2, 'titulo': 'Tipos de IA', 'pregunta': '¿Todas las IA son ChatGPT?',
-         'tarea': 'Clasifica 10 herramientas en su tipo (juego de arrastrar)',
+         'tarea': 'Clasifica 10 herramientas en su tipo (laboratorio de la lección 2.3)',
          'lecciones': [
              ('ia-que-conversa', 'IA que conversa', True),
              ('ia-que-crea', 'IA que crea imágenes, vídeo y voz', True),

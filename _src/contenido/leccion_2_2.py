@@ -24,6 +24,25 @@ LECCION = {
              '<p>En esta lección vas a ver qué puede crear la IA.</p>'),
         ]),
         ('Descubre', [
+            ('lab', {
+                'tipo': 'clasifica', 'id': 'ia-que-crea-quecrea', 'titulo': '¿Qué IA crea qué?',
+                'intro': '<p>No todo lo que crea la IA es texto. Pon cada encargo con el tipo de IA que lo haría: texto, imagen, voz o vídeo. El primero ya está hecho.</p>',
+                'intro_f': '<p>¿Qué crea la IA en cada caso? ¿Texto, imagen, voz o vídeo?</p>',
+                'categorias': [
+                    {'id': 'texto', 't': 'Texto', 'd': 'Escribe', 'p': 'Pídeselo a un chat de IA: dile para quién es, cómo de largo y con qué tono.'},
+                    {'id': 'imagen', 't': 'Imagen', 'd': 'Dibuja', 'p': 'Describe qué sale, los colores, el momento del día y el estilo. Y revisa manos y letras.'},
+                    {'id': 'voz', 't': 'Voz', 'd': 'Habla o canta', 'p': 'Puede leer tus textos en voz alta. Nunca imites la voz de una persona real sin su permiso.'},
+                    {'id': 'video', 't': 'Vídeo', 'd': 'Imágenes que se mueven', 'p': 'Es lo más nuevo y lo que más falla: empieza por algo cortito y sin personas reales.'}],
+                'items': [
+                    {'t': 'La carta de tapas traducida al portugués', 'c': 'texto', 'f': True, 'x': 'Escribir y traducir es cosa de la IA de texto, como en el bar de Paco.', 'xf': 'Es texto: escribe y traduce.'},
+                    {'t': 'El dibujo de una tarta con forma de tractor', 'c': 'imagen', 'f': True, 'x': 'Una descripción que se convierte en dibujo: IA de imagen.', 'xf': 'Es una imagen: un dibujo.'},
+                    {'t': 'El bando del ayuntamiento leído con una voz artificial', 'tf': 'Una voz que lee el bando', 'c': 'voz', 'f': True, 'x': 'Convierte un texto en voz hablada: IA de voz. Ayuda a quien no puede leer bien.', 'xf': 'Es voz: lee en voz alta.'},
+                    {'t': 'Un anuncio de 10 segundos con el castillo en movimiento', 'tf': 'Un vídeo corto del castillo', 'c': 'video', 'f': True, 'x': 'Imágenes que se mueven, creadas de cero: IA de vídeo.', 'xf': 'Es vídeo: imágenes que se mueven.'},
+                    {'t': 'El mensaje para invitar a la comida de la asociación', 'c': 'texto', 'x': 'Un mensaje escrito: IA de texto. Las fechas, compruébalas tú.'},
+                    {'t': 'El cartel de la verbena con farolillos', 'c': 'imagen', 'x': 'Un dibujo para el cartel: IA de imagen. Si lleva letras, revisa que se lean.'},
+                    {'t': 'Una cuña de radio para la feria con voz de locutor', 'c': 'voz', 'x': 'Una voz que lee o anuncia: IA de voz.'},
+                    {'t': 'Convertir una foto de la plaza en un vídeo corto', 'c': 'video', 'x': 'Parte de una foto, pero el resultado se mueve: IA de vídeo.'}],
+                'reto': {'t': 'Ahora tú: ¿qué te gustaría crear con IA para tu casa, tu trabajo o tu pueblo?', 'tf': '¿Qué quieres crear tú?', 'ph': 'por ejemplo, la felicitación de cumpleaños de mi nieta'}}),
             ('info',
              '<h3>La idea clave</h3>'
              '<p>Hay IA que no solo escribe: también crea imágenes, vídeos, música y voces. Se les llama IA [[generativa|IA que crea cosas nuevas: textos, dibujos, vídeos o voces.]] porque generan algo nuevo a partir de lo que tú le describes. Tú escribes «un cartel alegre con flores para una peluquería» y te dibuja uno que no existía.</p>'
@@ -40,6 +59,34 @@ LECCION = {
              '<h3>Lo que conviene cuidar</h3><ul><li>Revisa manos, caras y letras: es donde más falla.</li><li>No uses fotos de otras personas sin su permiso, y menos de niños.</li><li>No imites la cara ni la voz de nadie real.</li><li>Si una imagen o un audio te parece rarísimo, sospecha: puede ser falso.</li></ul>',
              '<h3>Puede crear</h3><ul class="lista-ok"><li>Dibujos para carteles.</li><li>Vídeos cortos.</li><li>Voces que leen textos.</li></ul>'
              '<h3>Ten cuidado</h3><ul><li>Revisa las manos y las letras.</li><li>No uses fotos de otras personas sin permiso.</li><li>Un audio o un vídeo puede ser falso.</li></ul>'),
+            ('lab', {
+                'tipo': 'verdad-o-mito', 'id': 'ia-que-crea-senales', 'titulo': '¿Pista de imagen falsa o no?',
+                'intro': '<p>Las imágenes hechas con IA mejoran cada mes, así que no hay ninguna prueba infalible. Pero hay pistas que ayudan, y otras que no sirven para nada. ¿Cuál es cuál? Si dudas de una imagen, lo más seguro sigue siendo buscar de dónde viene.</p>',
+                'intro_f': '<p>¿Cómo saber si una foto la hizo una IA? Hay pistas que sirven y otras que no.</p>',
+                'pregunta': '¿Es una pista de que la imagen la ha hecho una IA?', 'preguntaf': '¿Es una pista?',
+                'etiquetas': {'si': 'Es una pista', 'no': 'No es una pista', 'fsi': 'es una pista', 'fno': 'no es una pista'},
+                'cartas': [
+                    {'t': 'Una mano con seis dedos, o dedos que se funden entre sí.', 'tf': 'Una mano con seis dedos.', 'v': True, 'f': True,
+                     'x': 'Las manos son de lo que más falla. Cuenta los dedos.', 'xf': 'Es una pista. Cuenta los dedos.'},
+                    {'t': 'Letras de un cartel que no se pueden leer, como inventadas.', 'tf': 'Letras que no se entienden.', 'v': True, 'f': True,
+                     'x': 'La IA dibuja la forma de las letras sin saber escribir. Si los carteles del fondo no dicen nada con sentido, sospecha.', 'xf': 'Es una pista. La IA dibuja mal las letras.'},
+                    {'t': 'La foto está un poco borrosa.', 'v': False, 'f': True,
+                     'x': 'Muchísimas fotos reales salen movidas o borrosas. Eso solo no dice nada.', 'xf': 'No es una pista. Muchas fotos reales salen borrosas.'},
+                    {'t': 'Sombras que van hacia lados distintos con un solo sol.', 'tf': 'Sombras que van a lados distintos.', 'v': True, 'f': True,
+                     'x': 'Con un solo sol, las sombras van hacia el mismo lado. Si no, algo raro pasa.', 'xf': 'Es una pista. Con un sol, las sombras van al mismo lado.'},
+                    {'t': 'Sale una persona famosa.', 'v': False, 'f': True,
+                     'x': 'Que salga alguien famoso no la hace falsa ni verdadera. Busca de dónde viene la foto.', 'xf': 'No es una pista. Mira de dónde viene la foto.'},
+                    {'t': 'Orejas deformes o pendientes que se funden con la piel.', 'v': True,
+                     'x': 'Orejas, dientes y pendientes son detalles donde la IA suele liarse.'},
+                    {'t': 'Los colores son muy bonitos y vivos.', 'v': False,
+                     'x': 'Muchas fotos reales tienen colores vivos, y muchas de IA no. Por sí solo, no sirve.'},
+                    {'t': 'El fondo tiene cosas que se derriten o líneas que no encajan.', 'v': True,
+                     'x': 'Barandillas que se cortan, ventanas torcidas, objetos derretidos: el fondo delata mucho.'},
+                    {'t': 'La ha compartido muchísima gente por WhatsApp.', 'v': False,
+                     'x': 'Que corra mucho no la hace verdadera. Los bulos son justo lo que más se comparte.'},
+                    {'t': 'La piel parece de plástico, perfecta y sin poros.', 'v': True,
+                     'x': 'Una piel demasiado lisa, como de muñeco, es una pista frecuente. Pero los filtros de las cámaras también lo hacen: mira más cosas.'},
+                ]}),
         ]),
         ('Prueba', [
             ('tarea',
@@ -74,6 +121,15 @@ LECCION = {
              '<p>Enséñale a alguien de tu entorno el dibujo que has creado y pregúntale si sabría decir que lo ha hecho una IA. Después cuéntale el consejo más importante de esta lección: <b>ante un audio o un vídeo que pide dinero con prisas, llama tú a la persona</b>.</p>'
              '<p>Si quieres, mándanos tu dibujo por WhatsApp.</p>',
              '<p>Enseña tu dibujo a una persona.</p><ul><li>Pregúntale si sabe que lo hizo una IA.</li><li>Cuéntale que los audios pueden ser falsos.</li></ul>'),
+            ('lab', {
+                'tipo': 'explicaselo', 'id': 'ia-que-crea-explica', 'titulo': 'Explícaselo a…', 'tema': 'la IA que crea imágenes, vídeo y voz',
+                'intro': '<p>Elige a quién se lo cuentas y rellena los huecos con tus palabras. Después, mándaselo por WhatsApp o cópialo.</p>',
+                'intro_f': '<p>Elige a una persona. Escribe con tus palabras. Mándalo por WhatsApp.</p>',
+                'huecos': [
+                    {'l': 'Qué puede crear', 'lf': 'Qué crea', 'ph': 'dibujos, vídeos y voces a partir de lo que le describes'},
+                    {'l': 'Dónde suele fallar', 'lf': 'Dónde falla', 'ph': 'en las manos, las caras y las letras'},
+                    {'l': 'El consejo más importante', 'lf': 'Un consejo', 'ph': 'si un audio te pide dinero con prisas, cuelga y llama tú'},
+                ]}),
         ]),
         ('Piensa', [
             ('quiz', [
@@ -82,19 +138,22 @@ LECCION = {
                   ('Crea una imagen nueva a partir de lo que le describes', True, False),
                   ('Saca fotos con la cámara del móvil sin avisar', False, True),
                   ('Solo arregla fotos antiguas', False, True)],
-                 'Crea una imagen que no existía, a partir de tu descripción y de todo lo que aprendió de millones de imágenes.'),
+                 'Crea una imagen que no existía, a partir de tu descripción y de todo lo que aprendió de millones de imágenes.',
+                 'Crea un dibujo nuevo con lo que le dices.'),
                 ('¿En qué detalles suelen fallar las imágenes hechas con IA?',
                  [('En las manos, las caras y las letras', True, False),
                   ('En nada, son siempre perfectas', False, False),
                   ('Solo en los colores del cielo', False, True),
                   ('Solo cuando son en blanco y negro', False, True)],
-                 'Manos con dedos de más, letras inventadas o sombras imposibles. Míralo todo dos veces antes de usarlo.'),
+                 'Manos con dedos de más, letras inventadas o sombras imposibles. Míralo todo dos veces antes de usarlo.',
+                 'Mira bien las manos y las letras.'),
                 ('Te llega un audio con la voz de tu nieto pidiéndote dinero urgente. ¿Qué haces?',
                  [('Le mando el dinero enseguida, es su voz', False, False),
                   ('Cuelgo y le llamo yo a su número de siempre', True, False),
                   ('Le contesto con los datos de mi cuenta', False, True),
                   ('Le reenvío el audio a todos mis contactos', False, True)],
-                 'La IA puede imitar voces. Ante cualquier petición de dinero con prisas, comprueba llamando tú a la persona.'),
+                 'La IA puede imitar voces. Ante cualquier petición de dinero con prisas, comprueba llamando tú a la persona.',
+                 'La voz puede ser falsa. Llama tú a la persona.'),
             ]),
             ('texto',
              '<p><label for="reflexion-2-2"><b>Tu reflexión en una línea:</b> ¿para qué usarías tú una IA que crea imágenes, y para qué no?</label></p>'

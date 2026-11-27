@@ -40,8 +40,37 @@ LECCION = {
              '<h3>Para qué no fiarte de ella</h3><ul><li>Datos exactos: fechas, precios, leyes, horarios.</li><li>Decisiones de salud, dinero o trámites: ahí, una persona experta.</li><li>Guardar tus secretos: no le des tu DNI, tus contraseñas ni tus números del banco.</li><li>Saber lo que ha pasado hoy en tu pueblo.</li></ul>',
              '<h3>Es buena para</h3><ul class="lista-ok"><li>Escribir mensajes.</li><li>Explicar cosas difíciles.</li><li>Traducir.</li><li>Darte ideas.</li></ul>'
              '<h3>No te fíes para</h3><ul><li>Fechas y precios.</li><li>Temas de salud o de dinero.</li><li>Guardar tus datos. No le des tu DNI.</li></ul>'),
+            ('lab', {
+                'tipo': 'elige-la-mejor', 'id': 'ia-que-conversa-elige', 'titulo': '¿Qué respuesta es mejor?',
+                'intro': '<p>Dos respuestas de IA a la misma petición. Las dos suenan bien. ¿Con cuál te quedas? Elige, di cómo de seguro estás y después te enseñamos en qué fijarte.</p>',
+                'intro_f': '<p>Hay dos respuestas de una IA. Elige la mejor. Después te decimos por qué.</p>',
+                'rondas': [
+                    {'f': True,
+                     'pide': 'Escríbeme el horario del bar para Semana Santa, para ponerlo en la puerta.',
+                     'a': {'t': '<p>¡Claro! Aquí tienes un horario perfecto:</p><p><mark data-c="1">Abrimos todos los días de 8:00 a 24:00</mark>, <mark data-c="1">con música en directo el Jueves Santo</mark> y <mark data-c="1">menú especial por 15 euros</mark>.</p><p><mark data-c="2">En nuestro establecimiento nos complace ofrecer una experiencia gastronómica inolvidable a todos nuestros distinguidos clientes durante estas fechas tan señaladas.</mark></p>'},
+                     'b': {'t': '<p><mark data-c="2"><b>Horario de Semana Santa</b></mark></p><p>Jueves Santo: de <mark data-c="1">[hora]</mark> a <mark data-c="1">[hora]</mark><br>Viernes Santo: de [hora] a [hora]<br>Sábado: de [hora] a [hora]<br>Domingo: [abierto o cerrado]</p><p><mark data-c="3">No sé tu horario: rellena las horas antes de imprimirlo. Si me las dices, te lo dejo listo.</mark></p>'},
+                     'mejor': 'b',
+                     'criterios': [{'c': 1, 't': 'No se inventa datos: deja huecos donde no sabe.', 'tf': 'No se inventa las horas.'},
+                                   {'c': 2, 't': 'Hace lo que se le pide: corto y claro, para una puerta.', 'tf': 'Es corto y claro.'},
+                                   {'c': 3, 't': 'Te avisa de lo que tienes que revisar tú.', 'tf': 'Te dice qué revisar.'}],
+                     'x': 'La A suena muy bien, pero se ha inventado el horario, la música y el precio. Si la cuelgas, tendrás clientes en la puerta a las ocho. La B deja huecos y te avisa: es la útil.',
+                     'xf': 'La A se inventa las horas. La B deja huecos para que pongas tus horas.'},
+                    {'pide': 'Explícame esta frase de una carta del banco: «Le comunicamos el cargo del adeudo domiciliado».',
+                     'a': {'t': '<p><mark data-c="2">El adeudo domiciliado constituye una orden de cobro emitida por el acreedor contra la cuenta del deudor en virtud de un mandato previamente autorizado.</mark></p><p><mark data-c="1">Para revisarlo bien, dime tu número de cuenta y tu DNI.</mark></p>'},
+                     'b': {'t': '<p><mark data-c="2">Quiere decir que te han cobrado un recibo en tu cuenta</mark>, como el de la luz o el del agua, porque un día diste permiso para que lo cobraran directamente.</p><p><mark data-c="3">Si no sabes de qué es, llama a tu banco o pásate por la oficina.</mark> <mark data-c="1">No hace falta que me des tus datos para explicártelo.</mark></p>'},
+                     'mejor': 'b',
+                     'criterios': [{'c': 1, 't': 'Cuida tus datos: no te los pide.'},
+                                   {'c': 2, 't': 'Te lo explica con palabras sencillas.'},
+                                   {'c': 3, 't': 'Te dice qué hacer después y con quién comprobarlo.'}],
+                     'x': 'La A es correcta, pero no se entiende y, además, te pide tu cuenta y tu DNI: eso nunca. La B lo explica fácil y te manda a comprobarlo con tu banco.'},
+                ]}),
         ]),
         ('Prueba', [
+            ('lab', {
+                'tipo': 'evaluador-prompts', 'id': 'ia-que-conversa-evaluador', 'titulo': 'Mejora este mensaje antes de mandarlo', 'modo': 'corto',
+                'inicial': 'Escribe un mensaje para mi familia.',
+                'intro': '<p>Antes de abrir un chat de verdad, prueba aquí. Esto es lo que le pediría casi todo el mundo. Mejóralo con lo que te sugiere el evaluador hasta pasar de 70: verás que la IA contesta mucho mejor cuando sabe quién eres, para qué es y cómo lo quieres. Lo verás a fondo en el módulo 4.</p>',
+                'intro_f': '<p>Mejora este mensaje. Toca «Añadir» para poner las piezas que faltan.</p>'}),
             ('tarea',
              '<h3>Tarea guiada · 10 minutos</h3>'
              '<p>Vas a tener tu primera conversación de verdad, de tres pasos:</p>'
@@ -75,6 +104,15 @@ LECCION = {
              '<p>Enséñale a alguien de tu entorno el mensaje que has conseguido en la tarea, con sus tres versiones. Cuéntale el truco: <b>no hace falta acertar a la primera, se le va corrigiendo</b>.</p>'
              '<p>Si quieres, mándanos por WhatsApp la corrección que mejor te ha funcionado.</p>',
              '<p>Enseña a una persona tu mensaje.</p><ul><li>Cuéntale que a la IA le puedes pedir cambios.</li></ul>'),
+            ('lab', {
+                'tipo': 'explicaselo', 'id': 'ia-que-conversa-explica', 'titulo': 'Explícaselo a…', 'tema': 'cómo hablar con una IA que conversa',
+                'intro': '<p>Elige a quién se lo cuentas y rellena los huecos con tus palabras. Después, mándaselo por WhatsApp o cópialo.</p>',
+                'intro_f': '<p>Elige a una persona. Escribe con tus palabras. Mándalo por WhatsApp.</p>',
+                'huecos': [
+                    {'l': 'Qué es un chat de IA', 'lf': 'Qué es', 'ph': 'un programa con el que hablas como por WhatsApp'},
+                    {'l': 'Un truco', 'lf': 'Un truco', 'ph': 'no hace falta acertar a la primera: le vas pidiendo cambios'},
+                    {'l': 'Un cuidado', 'lf': 'Un cuidado', 'ph': 'no le des tu DNI ni tus números del banco'},
+                ]}),
         ]),
         ('Piensa', [
             ('quiz', [
@@ -83,19 +121,22 @@ LECCION = {
                   ('Que recuerda lo que le has dicho en ese chat y puedes ir corrigiéndola', True, False),
                   ('Que es una persona que te contesta desde una oficina', False, True),
                   ('Que solo entiende órdenes en inglés', False, True)],
-                 'Dentro de una misma conversación se acuerda de lo anterior. Por eso puedes pedirle cambios sin repetirlo todo.'),
+                 'Dentro de una misma conversación se acuerda de lo anterior. Por eso puedes pedirle cambios sin repetirlo todo.',
+                 'Se acuerda de la conversación. Le puedes pedir cambios.'),
                 ('¿Para qué NO deberías fiarte de una IA que conversa sin comprobarlo?',
                  [('Para fechas, precios, leyes o temas de salud', True, False),
                   ('Para darte ideas de un menú', False, False),
                   ('Para hacer más corto un mensaje', False, True),
                   ('Para cambiar el tono de un texto', False, True)],
-                 'Escribe muy bien, pero se puede inventar datos. Lo que tenga consecuencias, compruébalo en una fuente fiable o con una persona experta.'),
+                 'Escribe muy bien, pero se puede inventar datos. Lo que tenga consecuencias, compruébalo en una fuente fiable o con una persona experta.',
+                 'Comprueba las fechas, los precios y la salud.'),
                 ('Quieres que te explique una carta del banco. ¿Qué haces?',
                  [('Le hago una foto a la carta entera con mis datos y la subo', False, False),
                   ('Copio solo el texto que no entiendo, sin mi nombre ni mis números', True, False),
                   ('Le doy también mi número de cuenta para que lo revise', False, True),
                   ('Le doy mi DNI para que sepa quién soy', False, True)],
-                 'Puede ayudarte a entender la carta, pero tus datos personales y bancarios no hacen falta. Quítalos antes.'),
+                 'Puede ayudarte a entender la carta, pero tus datos personales y bancarios no hacen falta. Quítalos antes.',
+                 'No le des tus datos. Solo el texto que no entiendes.'),
             ]),
             ('texto',
              '<p><label for="reflexion-2-1"><b>Tu reflexión en una línea:</b> ¿para qué le pedirías ayuda tú a una IA que conversa?</label></p>'

@@ -3,6 +3,8 @@
 # Formato de cada paso: lista de bloques (tipo, normal, facil). Las palabras del glosario se
 # escriben como [[palabra|definición]].
 
+from reglas_prompts import CONSTRUCTOR
+
 LECCION = {
     'id': 'asistentes-y-agentes',
     'modulo': 2,
@@ -40,8 +42,34 @@ LECCION = {
              '<h3>Agente</h3><ul><li>Recibe un objetivo y decide él los pasos.</li><li>Puede entrar en webs, rellenar formularios o enviar mensajes.</li><li>Ahorra mucho tiempo en tareas repetitivas.</li><li>Si se equivoca, puede hacerlo en tu nombre: revisa antes de que envíe, pague o firme.</li></ul>',
              '<h3>Asistente</h3><ul class="lista-ok"><li>Espera a que le pidas algo.</li><li>Hace una cosa cada vez.</li><li>Ejemplo: pone una alarma.</li></ul>'
              '<h3>Agente</h3><ul><li>Hace una tarea larga él solo.</li><li>Puede enviar cosas en tu nombre.</li><li>Tú revisas antes de enviar o pagar.</li></ul>'),
+            ('lab', {
+                'tipo': 'clasifica', 'id': 'asistentes-y-agentes-quien', 'titulo': '¿Quién lo hace?',
+                'intro': '<p>Cuanto más hace la IA por ti, más importa saber qué le dejas. Coloca cada tarea: lo hace la IA, lo haces con ayuda de la IA o lo haces tú siempre. Algunas tienen matices: te los contamos.</p>',
+                'intro_f': '<p>¿Quién hace cada cosa? ¿La IA, tú con ayuda de la IA, o siempre tú?</p>',
+                'categorias': [
+                    {'id': 'ia', 't': 'Lo hace la IA', 'd': 'Te lo quita de encima', 'p': 'Que sea sencillo, que lo puedas comprobar y que, si falla, no pase nada grave.'},
+                    {'id': 'ayuda', 't': 'Con ayuda de la IA', 'd': 'La IA prepara, tú revisas', 'p': 'La IA prepara y tú revisas antes de usarlo: es lo más habitual.'},
+                    {'id': 'yo', 't': 'Lo hago yo siempre', 'd': 'Decides tú', 'p': 'Dinero, salud, firmas y decisiones sobre personas: siempre tú.'}],
+                'items': [
+                    {'t': 'Poner una alarma para mañana', 'c': 'ia', 'f': True, 'x': 'Es sencillo, lo compruebas enseguida y, si falla, no pasa nada grave.', 'xf': 'La IA. Es fácil y lo compruebas rápido.'},
+                    {'t': 'Escribir el borrador del aviso de horario para tus clientes', 'tf': 'Escribir un aviso para tus clientes', 'c': 'ayuda', 'f': True, 'x': 'La IA te ahorra el borrador; los horarios y los precios los revisas tú.', 'xf': 'Con ayuda. Tú revisas las horas.'},
+                    {'t': 'Decidir si pides un préstamo para el negocio', 'tf': 'Pedir un préstamo', 'c': 'yo', 'f': True, 'x': 'Las decisiones de dinero son tuyas. La IA puede explicarte palabras del contrato, pero decide con calma y, si hace falta, con tu gestoría o tu banco.', 'xf': 'Tú. El dinero lo decides tú.'},
+                    {'t': 'Hacer un bizum o pagar una factura', 'tf': 'Pagar una factura', 'c': 'yo', 'f': True, 'x': 'Pagar, nunca en manos de una máquina. Si algún día usas un agente, que no tenga permiso para pagar solo.', 'xf': 'Tú. Nunca dejes pagar a la IA.'},
+                    {'t': 'Decidir si te tomas una medicina', 'tf': 'Tomar una medicina', 'c': 'yo', 'f': True, 'x': 'La salud la decides con tu médico o tu farmacéutico. La IA, como mucho, te ayuda a preparar las preguntas para la consulta.', 'xf': 'Tú, con tu médico.'},
+                    {'t': 'Pasar a texto un audio largo de WhatsApp', 'tf': 'Pasar un audio a texto', 'c': ['ia', 'ayuda'], 'f': True, 'x': 'Lo puede hacer la IA sola. Si es importante, léelo: a veces entiende «vaca» por «baca».', 'xf': 'La IA. Si es importante, léelo.'},
+                    {'t': 'Traducir la carta del bar al portugués', 'c': 'ayuda', 'x': 'La IA traduce muy bien, pero antes de imprimirla, que la lea alguien que hable portugués.'},
+                    {'t': 'Firmar un documento de la asociación', 'c': 'yo', 'x': 'Lo que se firma lo decide y lo firma una persona. La IA puede ayudarte a entender el texto antes.'},
+                    {'t': 'Recordarte las pastillas cada mañana', 'c': ['ia', 'ayuda'], 'x': 'Un recordatorio es una tarea perfecta para un asistente. Qué pastillas tomar, eso lo decide el médico.'},
+                    {'t': 'Buscar el horario del autobús a Zafra', 'c': 'ayuda', 'x': 'Te puede ayudar a encontrarlo, pero los horarios cambian y la IA se los puede inventar: compruébalo en la web de la empresa o en la estación.'},
+                    {'t': 'Enviar tu currículum a una oferta de trabajo', 'c': ['yo', 'ayuda'], 'x': 'La IA te ayuda a mejorarlo, pero a quién se lo mandas lo decides tú: hay ofertas falsas.'},
+                    {'t': 'Preparar preguntas para una entrevista de trabajo', 'c': 'ayuda', 'x': 'Te da ideas para practicar; lo que cuentas de ti lo pones tú, y con verdad.'}],
+                'reto': {'t': 'Ahora tú: ¿qué tarea de tu día a día le dejarías a una IA?', 'tf': '¿Qué le dejarías hacer a la IA?', 'ph': 'por ejemplo, ordenar la lista de la compra'}}),
         ]),
         ('Prueba', [
+            ('lab', {
+                'tipo': 'constructor-prompts', 'id': 'asistentes-y-agentes-constructor', 'titulo': 'Monta tu prompt paso a paso', 'pasos': CONSTRUCTOR,
+                'intro': '<p>Rafa quiere que la IA le ayude a preparar su entrevista. Tú puedes hacer lo mismo con lo tuyo: elige una opción en cada paso, o escribe la tuya, y el prompt se monta solo. Cópialo y pruébalo en el chat de IA de la tarea. Si quieres afinarlo, llévalo al evaluador.</p>',
+                'intro_f': '<p>Elige una opción en cada paso. El mensaje para la IA se escribe solo. Después, cópialo.</p>'}),
             ('tarea',
              '<h3>Tarea guiada · 10 minutos</h3>'
              '<ol><li>Usa el asistente de voz de tu móvil (mantén pulsado el botón de inicio o di la palabra para despertarlo). Pídele: <q>Recuérdame mañana a las diez llamar al médico.</q> Comprueba en tu agenda o en tus recordatorios que lo ha apuntado bien.</li>'
@@ -73,6 +101,15 @@ LECCION = {
              '<p>Cuéntale a alguien de tu entorno la diferencia entre un asistente y un agente con un ejemplo de tu vida. Y pregúntale: <b>¿qué tarea le dejarías tú a una IA y cuál nunca?</b> Seguro que no coincidís del todo.</p>'
              '<p>Si quieres, mándanos por WhatsApp vuestras respuestas.</p>',
              '<p>Cuéntale a una persona:</p><ul><li>Qué hace un asistente.</li><li>Qué hace un agente.</li></ul><p>Pregúntale qué le dejaría hacer a una IA.</p>'),
+            ('lab', {
+                'tipo': 'explicaselo', 'id': 'asistentes-y-agentes-explica', 'titulo': 'Explícaselo a…', 'tema': 'la diferencia entre un asistente y un agente',
+                'intro': '<p>Elige a quién se lo cuentas y rellena los huecos con tus palabras. Después, mándaselo por WhatsApp o cópialo.</p>',
+                'intro_f': '<p>Elige a una persona. Escribe con tus palabras. Mándalo por WhatsApp.</p>',
+                'huecos': [
+                    {'l': 'Qué hace un asistente', 'lf': 'Un asistente…', 'ph': 'hace lo que le pides, una cosa cada vez'},
+                    {'l': 'Qué hace un agente', 'lf': 'Un agente…', 'ph': 'hace él solo una tarea de varios pasos, como mandar correos'},
+                    {'l': 'Qué no le dejarías nunca', 'lf': 'Nunca le dejaría', 'ph': 'pagar, firmar o decidir sobre mi salud'},
+                ]}),
         ]),
         ('Piensa', [
             ('quiz', [
@@ -81,19 +118,22 @@ LECCION = {
                   ('No hay ninguna diferencia, son dos nombres de lo mismo', False, False),
                   ('El agente es una persona y el asistente una máquina', False, True),
                   ('El asistente solo funciona sin internet', False, True)],
-                 'El asistente hace una cosa cada vez que se lo pides. El agente recibe un objetivo y decide él los pasos para conseguirlo.'),
+                 'El asistente hace una cosa cada vez que se lo pides. El agente recibe un objetivo y decide él los pasos para conseguirlo.',
+                 'El asistente hace una cosa. El agente hace una tarea larga.'),
                 ('¿Cuál de estas cosas es un ejemplo de asistente?',
                  [('Una IA que busca ofertas, rellena formularios y manda tu currículum sola', False, False),
                   ('Decirle al móvil «pon una alarma a las siete»', True, False),
                   ('Un vecino que te ayuda con la compra', False, True),
                   ('El calendario de papel de la cocina', False, True)],
-                 'Le pides una cosa concreta, la hace y espera. Eso es un asistente.'),
+                 'Le pides una cosa concreta, la hace y espera. Eso es un asistente.',
+                 'Le pides una cosa y la hace. Es un asistente.'),
                 ('Usas un agente que manda correos por ti. ¿Qué es lo más prudente?',
                  [('Que me enseñe cada correo antes de enviarlo', True, False),
                   ('Darle mi contraseña del banco por si tiene que pagar algo', False, False),
                   ('Dejarle hacer y no mirar nunca lo que envía', False, True),
                   ('Darle permiso para firmar documentos en mi nombre', False, True)],
-                 'Lo que haga un agente en tu nombre es responsabilidad tuya. Revisa antes de que envíe, pague o firme.'),
+                 'Lo que haga un agente en tu nombre es responsabilidad tuya. Revisa antes de que envíe, pague o firme.',
+                 'Revisa siempre antes de enviar, pagar o firmar.'),
             ]),
             ('texto',
              '<p><label for="reflexion-2-4"><b>Tu reflexión en una línea:</b> ¿qué tarea de tu día a día le dejarías a una IA, y cuál no le dejarías nunca?</label></p>'

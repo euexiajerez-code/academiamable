@@ -42,6 +42,28 @@ LECCION = {
              '<h3>Clasifica</h3><ul class="lista-ok"><li>El correo.</li><li>Tus fotos.</li></ul>'),
         ]),
         ('Prueba', [
+            ('lab', {
+                'tipo': 'clasifica', 'id': 'ia-que-reconoce-tipos', 'titulo': '¿Qué tipo de IA es?',
+                'intro': '<p>Esta es la tarea práctica del módulo 2. Once herramientas y situaciones de tu día a día (la primera ya está resuelta, así que clasificas diez): ¿qué tipo de IA hay detrás de cada una? Usa lo que has visto en las lecciones 2.1 a 2.4.</p>',
+                'intro_f': '<p>Es la tarea del módulo 2. ¿Qué tipo de IA es cada una?</p>',
+                'categorias': [
+                    {'id': 'conversa', 't': 'Conversa', 'd': 'Habla y escribe contigo', 'p': 'Pídele las cosas con claridad y corrige lo que no te guste en el mismo chat.'},
+                    {'id': 'crea', 't': 'Crea', 'd': 'Hace algo nuevo', 'p': 'Revisa lo que crea antes de usarlo, y no imites a personas reales.'},
+                    {'id': 'reconoce', 't': 'Reconoce', 'd': 'Mira o escucha y clasifica', 'p': 'Su respuesta es una pista, no una certeza: con setas o medicinas, pregunta a quien sepa.'},
+                    {'id': 'asistente', 't': 'Asistente', 'd': 'Hace lo que le pides', 'p': 'Comprueba que ha hecho lo que pediste, por ejemplo que la alarma está bien puesta.'}],
+                'items': [
+                    {'t': 'Google Lens te dice el nombre de una flor', 'c': 'reconoce', 'f': True, 'x': 'Mira la foto y la compara con millones de ejemplos para decirte a qué se parece más.', 'xf': 'Reconoce: mira la flor y dice qué es.'},
+                    {'t': 'ChatGPT te ayuda a traducir la carta del bar', 'c': 'conversa', 'f': True, 'x': 'Le escribes, te contesta y, si no te gusta, le pides cambios. Es una IA que conversa.', 'xf': 'Conversa: le escribes y te contesta.'},
+                    {'t': 'Decirle al móvil «pon una alarma a las siete»', 'tf': 'Pedir una alarma al móvil', 'c': 'asistente', 'f': True, 'x': 'Le pides una cosa concreta, la hace y espera. Eso es un asistente.', 'xf': 'Asistente: hace lo que le pides.'},
+                    {'t': 'Una IA dibuja el cartel de la verbena', 'c': 'crea', 'f': True, 'x': 'Hace una imagen que no existía: IA que crea.', 'xf': 'Crea: hace un dibujo nuevo.'},
+                    {'t': 'El correo manda la publicidad a la carpeta de spam', 'tf': 'El correo aparta el spam', 'c': 'reconoce', 'f': True, 'x': 'Clasifica cada correo: este es spam, este no. Es una IA que reconoce y clasifica.', 'xf': 'Reconoce: separa los correos malos.'},
+                    {'t': 'Gemini te explica con palabras sencillas una carta del banco', 'c': 'conversa', 'x': 'Le preguntas y te lo explica; puedes repreguntar. Conversa.'},
+                    {'t': 'Una voz artificial lee en alto el bando del ayuntamiento', 'c': 'crea', 'x': 'Crea una voz nueva que lee el texto: IA generativa de voz.'},
+                    {'t': 'El móvil se desbloquea al reconocer tu cara', 'tf': 'El móvil reconoce tu cara', 'c': 'reconoce', 'f': True, 'x': 'Compara tu cara con la que guardó: reconocimiento facial.', 'xf': 'Reconoce: mira tu cara.'},
+                    {'t': 'El altavoz de casa te dice qué tiempo hará en Zafra', 'c': ['asistente', 'conversa'], 'x': 'Le preguntas algo concreto y te responde: es un asistente. Si charlas con él, también conversa.'},
+                    {'t': 'El dictado del móvil pasa tu voz a texto', 'c': 'reconoce', 'x': 'Escucha tu voz y la reconoce palabra a palabra: IA que reconoce.'},
+                    {'t': 'Copilot te propone nombres para tu tienda', 'c': 'conversa', 'x': 'Le pides ideas y le contestas «más cortos» o «más alegres»: una IA que conversa.'}],
+                'reto': {'t': 'Ahora tú: ¿qué IA usas o te gustaría usar? Escríbela y ponla en su grupo.', 'tf': '¿Qué IA usas tú?', 'ph': 'por ejemplo, el traductor con la cámara'}}),
             ('tarea',
              '<h3>Tarea guiada · 10 minutos</h3>'
              '<ol><li>Abre Google Lens en el móvil. Suele estar en la app de Google (el icono de la cámara en la barra de búsqueda) o dentro de la cámara de tu móvil.</li>'
@@ -74,6 +96,15 @@ LECCION = {
              '<p>Sal a dar un paseo con alguien de tu entorno y enseñadle al móvil tres cosas: una planta, un cartel y algo que no tengáis claro qué es. Comentad en qué ha acertado y en qué no.</p>'
              '<p>Si quieres, mándanos por WhatsApp la cosa más rara que hayáis reconocido.</p>',
              '<p>Sal a pasear con una persona.</p><ul><li>Haced fotos a plantas con el móvil.</li><li>Mirad si la IA acierta.</li></ul>'),
+            ('lab', {
+                'tipo': 'explicaselo', 'id': 'ia-que-reconoce-explica', 'titulo': 'Explícaselo a…', 'tema': 'la IA que reconoce y clasifica',
+                'intro': '<p>Elige a quién se lo cuentas y rellena los huecos con tus palabras. Después, mándaselo por WhatsApp o cópialo.</p>',
+                'intro_f': '<p>Elige a una persona. Escribe con tus palabras. Mándalo por WhatsApp.</p>',
+                'huecos': [
+                    {'l': 'Qué hace', 'lf': 'Qué hace', 'ph': 'mira o escucha algo y te dice qué es'},
+                    {'l': 'Un ejemplo', 'lf': 'Un ejemplo', 'ph': 'Google Lens me dijo el nombre de una flor'},
+                    {'l': 'El cuidado', 'lf': 'Un cuidado', 'ph': 'con setas o medicinas, pregunta a alguien que sepa'},
+                ]}),
         ]),
         ('Piensa', [
             ('quiz', [
@@ -82,19 +113,22 @@ LECCION = {
                   ('Inventa dibujos nuevos', False, False),
                   ('Escribe novelas', False, True),
                   ('Llama por teléfono a quien tú le digas', False, True)],
-                 'Compara lo que ve u oye con muchísimos ejemplos y te dice a qué se parece más.'),
+                 'Compara lo que ve u oye con muchísimos ejemplos y te dice a qué se parece más.',
+                 'Mira una cosa y te dice qué es.'),
                 ('Encuentras una seta y Google Lens dice que es comestible. ¿Qué haces?',
                  [('Me la como, que lo dice el móvil', False, False),
                   ('Lo tomo como una pista y pregunto a una persona experta', True, False),
                   ('Le hago otra foto y, si dice lo mismo, me la como', False, True),
                   ('Se la doy a probar al perro', False, True)],
-                 'La IA te da lo más parecido, no una certeza. En cosas de salud o peligro, decide una persona que sepa.'),
+                 'La IA te da lo más parecido, no una certeza. En cosas de salud o peligro, decide una persona que sepa.',
+                 'El móvil se puede equivocar. Pregunta a una persona experta.'),
                 ('¿Qué NO deberías hacer con una IA que reconoce caras?',
                  [('Desbloquear mi propio móvil con mi cara', False, False),
                   ('Hacer fotos a otras personas para identificarlas sin su permiso', True, False),
                   ('Buscar mis fotos de la playa en la galería', False, True),
                   ('Traducir un cartel de la calle', False, True)],
-                 'Tu cara es tuya y la de los demás es suya. Para fotos de otras personas, y más si son niños, siempre con permiso.'),
+                 'Tu cara es tuya y la de los demás es suya. Para fotos de otras personas, y más si son niños, siempre con permiso.',
+                 'No hagas fotos a otras personas sin permiso.'),
             ]),
             ('texto',
              '<p><label for="reflexion-2-3"><b>Tu reflexión en una línea:</b> ¿qué te gustaría que te reconociera el móvil, y qué no le dejarías reconocer nunca?</label></p>'
